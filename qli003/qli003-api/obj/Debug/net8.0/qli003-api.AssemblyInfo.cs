@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("qli003-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+054e8c49d341da02410ea2edbc601a8cdaf20303")]
 [assembly: System.Reflection.AssemblyProductAttribute("qli003-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("qli003-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

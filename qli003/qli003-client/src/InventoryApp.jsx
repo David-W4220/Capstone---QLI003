@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:5097'; // Change the API_Base_URL to your
 const HUB_URL = `${API_BASE_URL}/qliHub`;
 const TABLE_CONTROLLERS = 
 {
-  Equipment: 'Equipment', Inventory: 'Inventory', Admins: 'Admins',   
+  Equipment: 'Equipment', Admins: 'Admins',   
   Auditlog: 'Auditlog', Transactionlog: 'Transactionlog',
 };
 //const API_URL = `${API_BASE_URL}/api/${API_CONTROLLER}`; moved into component now
@@ -83,10 +83,10 @@ const EquipmentUpdateForm = ({ equipment, fetchEquipment, API_URL }) => {
                     >
                         <option value="">-- Choose an item --</option>
                         {equipment && equipment.map(item => (
-                            <option key={item.ID} value={item.ID}>
-                                {item.Name} (ID: {item.ID})
-                            </option>
-                        ))}
+                            <option key={item.ID} value={item.ID}>
+                                {item.Name} (ID: {item.ID}) - Stock: {item.Item_Cnt} @ {item.Alpha_Loc}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
@@ -201,9 +201,9 @@ const InventoryApp = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
 
-            {/*JSX comment: added a table selection here to ensure bkend connection works*/}
+            {/* Table selection is fine */}
             <select value={selectedTable} onChange={(e) => setSelectedTable(e.target.value)} className="p-2 border rounded-lg mb-4">
-                {Object.keys(TABLE_CONTROLLERS).map((key) => (<option key={key} value={key}>{key}</option>))}
+                {Object.keys(TABLE_CONTROLLERS).map((key) => (<option key={key} value={TABLE_CONTROLLERS[key]}>{key}</option>))}
             </select>
 
             <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center">
@@ -228,6 +228,9 @@ const InventoryApp = () => {
                                             <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                             <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                             <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                            {/* 2. UPDATED: Added new headers */}
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Count</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                                             <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Threshold</th>
                                         </tr>
                                     </thead>
@@ -237,14 +240,13 @@ const InventoryApp = () => {
                                                 <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{item.ID}</td>
                                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{item.Name}</td>
                                                 <td className="px-3 py-2 text-sm text-gray-700 max-w-xs ">{item.Description}</td>
+                                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700 font-bold">{item.Item_Cnt}</td>
+                                                <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{item.Alpha_Loc}</td>
                                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{item.Threshold}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                {equipment.length === 0 && (
-                                    <div className="text-center p-4 text-gray-500">No equipment data found.</div>
-                                )}
                             </div>
                         )}
                     </div>
