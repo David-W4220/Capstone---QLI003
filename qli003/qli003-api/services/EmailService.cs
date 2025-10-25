@@ -1,16 +1,9 @@
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-
-namespace qli003_api.Services
-{
-    public class EmailService
+public class EmailService
     {
         private readonly QLIDbContext _context;
         private readonly IConfiguration _config;
@@ -51,17 +44,18 @@ namespace qli003_api.Services
                 FileName = "InventoryReport.pdf"
             };
 
-            var multipart = new Multipart("mixed");
-            multipart.Add(body);
-            multipart.Add(attachment);
+            var multipart = new Multipart("mixed")
+            {
+                body, attachment
+            };
             message.Body = multipart;
 
             //send the email via Papercut
             try
             {
                 using var client = new SmtpClient();
-                var host = _config["SMTP:Host"] ?? "localhost";
-                var port = int.Parse(_config["SMTP:Port"] ?? "25");
+                var host = "localhost";
+                var port = 25;
                 await client.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.None);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
@@ -73,9 +67,7 @@ namespace qli003_api.Services
             }
         }
 
-        private byte[] GeneratePdf(
-            System.Collections.Generic.List<Audit_Log> audits,
-            System.Collections.Generic.List<Transaction_Log> transactions)
+        private byte[] GeneratePdf(List<Audit_Log> audits, List<Transaction_Log> transactions)
         {
             using var stream = new MemoryStream();
 
@@ -84,10 +76,8 @@ namespace qli003_api.Services
                 container.Page(page =>
                 {
                     page.Margin(40);
-                    page.Header()
-                        .Text("Inventory Report")
-                        .FontSize(24)
-                        .SemiBold().AlignCenter();
+                    //header line
+                    page.Header().Text("Inventory Report").FontSize(24).SemiBold().AlignCenter();
 
                     page.Content().Column(col =>
                     {
@@ -97,6 +87,7 @@ namespace qli003_api.Services
                             table.ColumnsDefinition(c =>
                             {
                                 c.RelativeColumn(1);
+                                c.RelativeColumn(1);
                                 c.RelativeColumn(3);
                                 c.RelativeColumn(2);
                             });
@@ -104,6 +95,7 @@ namespace qli003_api.Services
                             table.Header(h =>
                             {
                                 h.Cell().Text("ID").Bold();
+                                h.Cell().Text("Admin ID").Bold();
                                 h.Cell().Text("Action").Bold();
                                 h.Cell().Text("Timestamp").Bold();
                             });
@@ -111,13 +103,13 @@ namespace qli003_api.Services
                             foreach (var a in audits)
                             {
                                 table.Cell().Text(a.ID.ToString());
-                                table.Cell().Text(a.Act_Description ?? "-");
-                                table.Cell().Text(a.Timestamp.ToString() ?? "-");
+                                table.Cell().Text(a.Admin_ID.ToString());
+                                table.Cell().Text(a.Act_Description);
+                                table.Cell().Text(a.Timestamp.ToString());
                             }
                         });
 
-                        col.Item().PaddingVertical(20).LineHorizontal(1);
-
+                        col.Item().PaddingVertical(20).LineHorizontal(1);//seperate line
                         col.Item().Text("Transaction Log").FontSize(18).Bold();
 
                         col.Item().Table(table =>
@@ -125,18 +117,18 @@ namespace qli003_api.Services
                             table.ColumnsDefinition(c =>
                             {
                                 c.RelativeColumn(1); // ID
-                                c.RelativeColumn(1); // Inventory_ID
-                                c.RelativeColumn(1); // Check_In
-                                c.RelativeColumn(1); // Quantity_Changed
-                                c.RelativeColumn(1); // Condition
-                                c.RelativeColumn(2); // Optional_Notes
-                                c.RelativeColumn(2); // Timestamp
+                                c.RelativeColumn(2); // Inventory_ID
+                                c.RelativeColumn(2); // Check_In
+                                c.RelativeColumn(2); // Quantity_Changed 1？
+                                c.RelativeColumn(2); // Condition
+                                c.RelativeColumn(3); // Optional_Notes
+                                c.RelativeColumn(3); // Timestamp
                             });
 
                             table.Header(h =>
                             {
                                 h.Cell().Text("ID").Bold();
-                                h.Cell().Text("Inventory ID").Bold();
+                                h.Cell().Text("Invent ID").Bold();
                                 h.Cell().Text("Check In").Bold();
                                 h.Cell().Text("Qty Changed").Bold();
                                 h.Cell().Text("Condition").Bold();
@@ -148,20 +140,18 @@ namespace qli003_api.Services
                             {
                                 table.Cell().Text(t.ID.ToString());
                                 table.Cell().Text(t.Inventory_ID.ToString());
-                                table.Cell().Text(t.Check_In ? "Yes" : "No");
+                                table.Cell().Text(t.Check_In ? "IN" : "OUT");
                                 table.Cell().Text(t.Quantity_Changed.ToString());
                                 table.Cell().Text(t.Condition.ToString());
-                                table.Cell().Text(t.Optional_Notes ?? "-");
-                                table.Cell().Text(t.Timestamp.ToString());  // Uses system's current culture
+                                table.Cell().Text(t.Optional_Notes);
+                                table.Cell().Text(t.Timestamp.ToString());//use default format for elegancy
                                 //table.Cell().Text(t.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                         });
 
                     });
-
-                    page.Footer()
-                        .AlignCenter()
-                        .Text(txt =>
+                    //footer line
+                    page.Footer().AlignCenter().Text(txt =>
                         {
                             txt.Span("Generated by QLI System • ").FontSize(10);
                             txt.CurrentPageNumber();
@@ -173,4 +163,3 @@ namespace qli003_api.Services
             return stream.ToArray();
         }
     }
-}

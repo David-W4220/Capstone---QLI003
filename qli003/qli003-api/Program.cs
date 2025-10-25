@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using qli003_api.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
@@ -42,7 +41,7 @@ builder.Services.AddCors(options =>
 
 
 //Register new mail service
-builder.Services.AddScoped<qli003_api.Services.EmailService>();
+builder.Services.AddScoped<EmailService>();
 
 //Tells the application to listen to all IPs on this port
 builder.WebHost.UseUrls("http://0.0.0.0:5097");
