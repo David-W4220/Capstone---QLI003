@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj": {}
+    "C:\\Users\\Austin\\OneDrive - University of Nebraska\\Desktop\\CSCI-4220\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj": {
+    "C:\\Users\\Austin\\OneDrive - University of Nebraska\\Desktop\\CSCI-4220\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj",
+        "projectUniqueName": "C:\\Users\\Austin\\OneDrive - University of Nebraska\\Desktop\\CSCI-4220\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj",
         "projectName": "qli003-api",
-        "projectPath": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj",
-        "packagesPath": "C:\\Users\\David Wang\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\obj\\",
+        "projectPath": "C:\\Users\\Austin\\OneDrive - University of Nebraska\\Desktop\\CSCI-4220\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj",
+        "packagesPath": "C:\\Users\\Austin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Austin\\OneDrive - University of Nebraska\\Desktop\\CSCI-4220\\Capstone---QLI003\\qli003\\qli003-api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\David Wang\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Austin\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -80,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import EquipmentSignOutModal from './components/EquipmentSignOutModal';
+import EquipmentDetailsModal from './components/EquipmentDetailsModal';
 
 const API_BASE_URL = 'http://localhost:5097'; // Change the API_Base_URL to your hosts IP. 
 // IE: from localhost to 192.168.X.X or the like
@@ -6,7 +8,7 @@ const API_BASE_URL = 'http://localhost:5097'; // Change the API_Base_URL to your
 const HUB_URL = `${API_BASE_URL}/qliHub`;
 const TABLE_CONTROLLERS = 
 {
-  Equipment: 'Equipment', Inventory: 'Inventory', Admins: 'Admins',   
+  Equipment: 'Equipment', Admins: 'Admins',   
   Auditlog: 'Auditlog', Transactionlog: 'Transactionlog',
 };
 //const API_URL = `${API_BASE_URL}/api/${API_CONTROLLER}`; moved into component now
@@ -128,6 +130,9 @@ const InventoryApp = () => {
     const API_URL = `${API_BASE_URL}/api/${selectedTable}`;
 
     const [equipment, setEquipment] = useState([]);
+    const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+    const [selectedEquipment, setSelectedEquipment] = useState(null);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -211,8 +216,28 @@ const InventoryApp = () => {
             </h1>
 
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1">
+                <div className="lg:col-span-1 space-y-4">
                     <EquipmentUpdateForm equipment={equipment} fetchEquipment={fetchEquipment} API_URL={API_URL}/>
+                    
+                    {/* Sign Out Button */}
+                    <div className="p-6 bg-white border border-blue-200 rounded-xl shadow-lg">
+                        <h2 className="text-2xl font-semibold text-blue-800 mb-4">Equipment Sign Out</h2>
+                        <button
+                            onClick={() => setIsSignOutModalOpen(true)}
+                            className="w-full py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Sign Out Equipment
+                        </button>
+                    </div>
+
+                    {/* Sign Out Modal */}
+                    <EquipmentSignOutModal
+                        equipment={equipment}
+                        isOpen={isSignOutModalOpen}
+                        onClose={() => setIsSignOutModalOpen(false)}
+                        onSignOut={fetchEquipment}
+                        API_URL={API_URL}
+                    />
                 </div>
 
                 <div className="lg:col-span-2">
@@ -233,7 +258,14 @@ const InventoryApp = () => {
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
                                         {equipment.map((item) => (
-                                            <tr key={item.ID} className="hover:bg-blue-50">
+                                            <tr 
+                                                key={item.ID} 
+                                                className="hover:bg-blue-50 cursor-pointer"
+                                                onClick={() => {
+                                                    setSelectedEquipment(item);
+                                                    setIsDetailsModalOpen(true);
+                                                }}
+                                            >
                                                 <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{item.ID}</td>
                                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{item.Name}</td>
                                                 <td className="px-3 py-2 text-sm text-gray-700 max-w-xs ">{item.Description}</td>
@@ -250,6 +282,16 @@ const InventoryApp = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Equipment Details Modal */}
+            <EquipmentDetailsModal
+                equipment={selectedEquipment}
+                isOpen={isDetailsModalOpen}
+                onClose={() => {
+                    setIsDetailsModalOpen(false);
+                    setSelectedEquipment(null);
+                }}
+            />
         </div>
     );
 };
