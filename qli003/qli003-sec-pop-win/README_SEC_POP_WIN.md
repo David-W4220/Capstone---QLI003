@@ -1,4 +1,5 @@
 This branch is to allow the testing of launching and adjusting window lock and content when performing certain functions
+NOTE: You must have the react-modal package installed for this to properly work.
 
 Copied from Main branch, and may not be 100% up-to-date 100% of the time.
 
