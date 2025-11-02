@@ -11,4 +11,6 @@ public class Equipment
     public int Threshold { get; set; }
     public string? ReodrLk_Pri_Qty { get; set; }
     public string? BuyQty { get; set; }
+    public int Item_Cnt { get; set; } 
+    public string? Alpha_Loc { get; set; } 
 }

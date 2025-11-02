@@ -33,7 +33,7 @@ public class EmailService
 
             var body = new TextPart("plain")
             {
-                Text = "Here's the text message."
+                Text = "Here's the test piain text message."
             };
 
             var attachment = new MimePart("application", "pdf")
@@ -117,21 +117,19 @@ public class EmailService
                             table.ColumnsDefinition(c =>
                             {
                                 c.RelativeColumn(1); // ID
-                                c.RelativeColumn(2); // Inventory_ID
-                                c.RelativeColumn(2); // Check_In
-                                c.RelativeColumn(2); // Quantity_Changed 1？
-                                c.RelativeColumn(2); // Condition
-                                c.RelativeColumn(3); // Optional_Notes
-                                c.RelativeColumn(3); // Timestamp
+                                c.RelativeColumn(1); // Inventory_ID
+                                c.RelativeColumn(1); // Check_In
+                                c.RelativeColumn(1); // Quantity_Changed 1？
+                                c.RelativeColumn(4); // Optional_Notes
+                                c.RelativeColumn(2); // Timestamp
                             });
 
                             table.Header(h =>
                             {
                                 h.Cell().Text("ID").Bold();
-                                h.Cell().Text("Invent ID").Bold();
-                                h.Cell().Text("Check In").Bold();
+                                h.Cell().Text("Equip ID").Bold();
+                                h.Cell().Text("Chked In/out").Bold();
                                 h.Cell().Text("Qty Changed").Bold();
-                                h.Cell().Text("Condition").Bold();
                                 h.Cell().Text("Notes").Bold();
                                 h.Cell().Text("Timestamp").Bold();
                             });
@@ -139,10 +137,9 @@ public class EmailService
                             foreach (var t in transactions)
                             {
                                 table.Cell().Text(t.ID.ToString());
-                                table.Cell().Text(t.Inventory_ID.ToString());
+                                table.Cell().Text(t.Equipment_ID.ToString());
                                 table.Cell().Text(t.Check_In ? "IN" : "OUT");
                                 table.Cell().Text(t.Quantity_Changed.ToString());
-                                table.Cell().Text(t.Condition.ToString());
                                 table.Cell().Text(t.Optional_Notes);
                                 table.Cell().Text(t.Timestamp.ToString());//use default format for elegancy
                                 //table.Cell().Text(t.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));

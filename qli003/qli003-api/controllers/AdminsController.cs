@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-//http://localhost:5097/api/Adminss
+//http://localhost:5097/api/Admins
 
 [Route("api/[controller]")]
 [ApiController]
