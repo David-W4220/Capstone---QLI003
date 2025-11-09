@@ -4176,19 +4176,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\David Wang\\.nuget\\packages\\": {}
+    "C:\\Users\\Ribuscus123\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj",
+      "projectUniqueName": "C:\\Users\\Ribuscus123\\Documents\\GitHub\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj",
       "projectName": "qli003-api",
-      "projectPath": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\qli003-api.csproj",
-      "packagesPath": "C:\\Users\\David Wang\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\David Wang\\Desktop\\CAPSTONE\\qli003\\qli003-api\\obj\\",
+      "projectPath": "C:\\Users\\Ribuscus123\\Documents\\GitHub\\Capstone---QLI003\\qli003\\qli003-api\\qli003-api.csproj",
+      "packagesPath": "C:\\Users\\Ribuscus123\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Ribuscus123\\Documents\\GitHub\\Capstone---QLI003\\qli003\\qli003-api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\David Wang\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Ribuscus123\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -4211,8 +4211,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.300"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -4262,7 +4261,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.414/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

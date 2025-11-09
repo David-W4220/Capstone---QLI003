@@ -1,1 +1,11 @@
-{"Version":1,"Hash":"2Z5cwRvhkosxfI8VZ2J3NQHcC82ObwmhCCv30ceqttM=","Source":"qli003-api","BasePath":"_content/qli003-api","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
+{
+  "Version": 1,
+  "Hash": "JiMgzfWNt2Gwpu4+qN0KbFhxSOxGk9FIuJICRzSf7qQ=",
+  "Source": "qli003-api",
+  "BasePath": "_content/qli003-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

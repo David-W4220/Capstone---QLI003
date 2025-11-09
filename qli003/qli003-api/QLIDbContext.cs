@@ -8,4 +8,5 @@ public class QLIDbContext : DbContext
     public DbSet<Admins> Admins { get; set; }
     public DbSet<Audit_Log> Audit_Log { get; set; }
     public DbSet<Transaction_Log> Transaction_Log { get; set; }
+
 }
