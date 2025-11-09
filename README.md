@@ -69,3 +69,67 @@ Before<br>
 
 ## Notes
 In future this should link to frontend react which should add a button to generate such mail instead of swagger.(Already Achieved)
+
+---------
+
+# UI Enhancement & Modal Components Update - November 9, 2025
+
+## New Features Added
+
+### 1. Modal Components (components-new/)
+Merge austin's three new modal components with Tailwind CSS (no external dependencies):
+- **EquipmentUpdateModal.jsx** - Update equipment descriptions via modal popup
+- **EquipmentDetailsModal.jsx** - View detailed equipment information by clicking table rows
+- **EquipmentSignOutModal.jsx** - Check Out equipment with transaction logging
+
+### 2. UI Improvements
+- Removed inline update form in favor of cleaner modal interface
+- Made table rows clickable to view equipment details
+- Added "Check Out Equipment" button with full transaction tracking
+- Implemented dynamic table rendering that displays all table types (Equipment, Admins, Auditlog, Transactionlog)
+
+### 3. Mobile Responsiveness
+- Enhanced mobile and tablet compatibility
+- Responsive table with overflow handling
+- Touch-friendly buttons and modals
+- Adaptive layouts for different screen sizes
+
+### 4. Bug Fixes
+- Fixed transaction log foreign key constraint (changed `Inventory_ID` to `Equipment_ID`)
+- Fixed modal visibility issues (buttons now stay visible when modal opens)
+- Added proper error handling and user feedback messages
+- Improved data refresh after operations
+
+## Files Modified
+- `src/Inventory-App.jsx` - Main application with modal integration and dynamic table
+- `src/components-new/EquipmentUpdateModal.jsx` - Modal for updates
+- `src/components-new/EquipmentDetailsModal.jsx` - Modal for viewing details
+- `src/components-new/EquipmentSignOutModal.jsx` - Modal for sign-out with transaction logging
+
+## How to Use New Features
+
+### View Equipment Details
+- Click any row in the Equipment table to see full details including stock status and reorder information
+
+### Update Equipment
+- Click "Update Equipment" button
+- Select equipment and modify description
+- Changes save and refresh automatically
+
+### Sign Out Equipment
+- Click "Sign Out Equipment" button
+- Enter your name (required)
+- Select equipment and quantity
+- Optionally add notes
+- System creates transaction log entry and updates inventory count
+
+### View Transaction History
+- Use the table dropdown at the top
+- Select "Transactionlog" to see all check-in/check-out history
+- View timestamps, quantities, and user notes
+
+## Technical Notes
+- All modals use Tailwind CSS for consistent styling
+- No external modal libraries required (removed react-modal dependency)
+- Real-time updates via SignalR still functional
+- Transaction logs properly track equipment sign-outs with foreign key constraints
