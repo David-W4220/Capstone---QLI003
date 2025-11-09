@@ -27,13 +27,16 @@ public class EmailService
 
             //build email
             var message = new MimeMessage();
+            message.Subject = "Inventory Report";
+            //change to company mail addresses for real deploys
             message.From.Add(new MailboxAddress("QLI System", "no-reply@qli003.local"));
             message.To.Add(new MailboxAddress("Test Receiver", "test@localhost"));
-            message.Subject = "Inventory Report";
+            
 
-            var body = new TextPart("plain")
+            var body = new TextPart("plain") //may chnage to html for HTML mails 
             {
-                Text = "Here's the test piain text message."
+                //Text = "<p>Line 1</p><p><b>Line 2 in bold!</b></p>"
+                Text = "Here's the test plain text message line 1.\nHere's the test plain text message line 2."
             };
 
             var attachment = new MimePart("application", "pdf")
@@ -54,15 +57,18 @@ public class EmailService
             try
             {
                 using var client = new SmtpClient();
-                var host = "localhost";
+                var host = "localhost"; //change to company mail address for real deploys
                 var port = 25;
                 await client.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.None);
+                //await client.AuthenticateAsync("company mail address", "password");
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"[Mailing Error！] {ex.GetType().Name}: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
                 return false;
             }
         }
@@ -70,7 +76,6 @@ public class EmailService
         private byte[] GeneratePdf(List<Audit_Log> audits, List<Transaction_Log> transactions)
         {
             using var stream = new MemoryStream();
-
             var document = Document.Create(container =>
             {
                 container.Page(page =>
@@ -111,7 +116,6 @@ public class EmailService
 
                         col.Item().PaddingVertical(20).LineHorizontal(1);//seperate line
                         col.Item().Text("Transaction Log").FontSize(18).Bold();
-
                         col.Item().Table(table =>
                         {
                             table.ColumnsDefinition(c =>
@@ -145,7 +149,6 @@ public class EmailService
                                 //table.Cell().Text(t.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                         });
-
                     });
                     //footer line
                     page.Footer().AlignCenter().Text(txt =>
@@ -155,7 +158,6 @@ public class EmailService
                         });
                 });
             });
-
             document.GeneratePdf(stream);
             return stream.ToArray();
         }
