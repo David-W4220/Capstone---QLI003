@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\qli003-api.props" />
-</Project>
