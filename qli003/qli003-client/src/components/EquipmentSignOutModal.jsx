@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
-
-// Set the app element for accessibility
-Modal.setAppElement('#root');
+import React, { useState, useEffect, useRef } from 'react';
 
 const EquipmentSignOutModal = ({ equipment, isOpen, onClose, onSignOut, API_URL }) => {
+    const dialogRef = useRef(null);
     const [selectedId, setSelectedId] = useState('');
     const [userName, setUserName] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [notes, setNotes] = useState('');
     const [errors, setErrors] = useState({});
     const [status, setStatus] = useState('');
+
+    useEffect(() => {
+        if (isOpen) {
+            dialogRef.current?.showModal();
+        } else {
+            dialogRef.current?.close();
+        }
+    }, [isOpen]);
 
     const selectedItem = selectedId ? equipment.find(item => item.ID === parseInt(selectedId)) : null;
 
@@ -114,28 +119,21 @@ const EquipmentSignOutModal = ({ equipment, isOpen, onClose, onSignOut, API_URL 
         }
     };
 
-    const modalStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            width: '400px',
-            padding: '20px',
-        },
-        overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)'
-        }
-    };
-
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onClose}
-            style={modalStyles}
-            contentLabel="Sign Out Equipment"
+        <dialog
+            ref={dialogRef}
+            className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full"
+            onClick={(e) => {
+                const dialogDimensions = e.currentTarget.getBoundingClientRect();
+                if (
+                    e.clientX < dialogDimensions.left ||
+                    e.clientX > dialogDimensions.right ||
+                    e.clientY < dialogDimensions.top ||
+                    e.clientY > dialogDimensions.bottom
+                ) {
+                    onClose();
+                }
+            }}
         >
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Sign Out Equipment</h2>
@@ -245,7 +243,7 @@ const EquipmentSignOutModal = ({ equipment, isOpen, onClose, onSignOut, API_URL 
                     </button>
                 </div>
             </form>
-        </Modal>
+        </dialog>
     );
 };
 

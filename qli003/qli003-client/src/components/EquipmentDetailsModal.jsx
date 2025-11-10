@@ -1,36 +1,33 @@
-import React from 'react';
-import Modal from 'react-modal';
-
-// Set the app element for accessibility
-Modal.setAppElement('#root');
+import React, { useEffect, useRef } from 'react';
 
 const EquipmentDetailsModal = ({ equipment, isOpen, onClose }) => {
-    const modalStyles = {
-        content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            width: '600px',
-            padding: '24px',
-            maxHeight: '80vh',
-            overflow: 'auto'
-        },
-        overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)'
+    const dialogRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            dialogRef.current?.showModal();
+        } else {
+            dialogRef.current?.close();
         }
-    };
+    }, [isOpen]);
 
     if (!equipment) return null;
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onClose}
-            style={modalStyles}
-            contentLabel="Equipment Details"
+        <dialog 
+            ref={dialogRef}
+            className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full"
+            onClick={(e) => {
+                const dialogDimensions = e.currentTarget.getBoundingClientRect();
+                if (
+                    e.clientX < dialogDimensions.left ||
+                    e.clientX > dialogDimensions.right ||
+                    e.clientY < dialogDimensions.top ||
+                    e.clientY > dialogDimensions.bottom
+                ) {
+                    onClose();
+                }
+            }}
         >
             <div className="relative">
                 {/* Close button */}
@@ -113,7 +110,7 @@ const EquipmentDetailsModal = ({ equipment, isOpen, onClose }) => {
                     )}
                 </div>
             </div>
-        </Modal>
+        </dialog>
     );
 };
 
