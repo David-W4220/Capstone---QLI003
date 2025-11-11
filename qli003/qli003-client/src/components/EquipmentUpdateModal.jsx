@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react';
 
-const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL }) => {
+const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL, isOpen, onClose, preSelectedItem }) => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedId, setSelectedId] = useState('');
     const [newDescription, setNewDescription] = useState('');
     const [status, setStatus] = useState('');
     const [errors, setErrors] = useState({});
+
+    // Support external control via isOpen prop
+    useEffect(() => {
+        if (isOpen !== undefined) {
+            setModalIsOpen(isOpen);
+            if (isOpen && preSelectedItem) {
+                setSelectedId(preSelectedItem.ID.toString());
+            }
+        }
+    }, [isOpen, preSelectedItem]);
+
+    // Close modal and call onClose callback if provided
+    const closeModal = () => {
+        setModalIsOpen(false);
+        if (onClose) {
+            onClose();
+        }
+    };
 
     const selectedItem = selectedId ? equipment.find(item => item.ID === parseInt(selectedId)) : null;
 
@@ -95,7 +113,7 @@ const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL }) => {
                     {/* Modal Backdrop */}
                     <div 
                         className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                        onClick={() => setModalIsOpen(false)}
+                        onClick={() => closeModal()}
                     />
 
                     {/* Modal Content */}
@@ -171,7 +189,7 @@ const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL }) => {
                             <button
                                 type="button"
                                 className="flex-1 py-2.5 px-4 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-                                onClick={() => setModalIsOpen(false)}
+                                onClick={() => closeModal()}
                             >
                                 Cancel
                             </button>

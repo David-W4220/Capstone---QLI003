@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, API_URL }) => {
+const EquipmentSignOutModal = ({ equipment, isOpen, onClose, onSignOut, API_URL }) => {
+    const [selectedId, setSelectedId] = useState('');
     const [userName, setUserName] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [notes, setNotes] = useState('');
     const [errors, setErrors] = useState({});
     const [status, setStatus] = useState('');
 
+    const selectedItem = selectedId ? equipment.find(item => item.ID === parseInt(selectedId)) : null;
+
     useEffect(() => {
         if (!isOpen) {
             // Reset form when modal closes
+            setSelectedId('');
             setUserName('');
             setQuantity(1);
             setNotes('');
@@ -33,6 +37,13 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
         // Quantity validation
         if (!quantity || quantity < 1) {
             newErrors.quantity = 'Quantity must be at least 1';
+        } else if (selectedItem && quantity > selectedItem.Item_Cnt) {
+            newErrors.quantity = 'Quantity cannot exceed available stock';
+        }
+
+        // Equipment selection validation
+        if (!selectedId) {
+            newErrors.equipment = 'Please select an equipment item';
         }
 
         setErrors(newErrors);
@@ -42,7 +53,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!validateForm() || !selectedEquipment) {
+        if (!validateForm()) {
             return;
         }
 
@@ -51,12 +62,12 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
         try {
             // Create transaction log entry
             const transaction = {
-                Equipment_ID: selectedEquipment.ID,
-                Check_In: true, // true for check-in
+                Equipment_ID: parseInt(selectedId),
+                Check_In: false, // false for sign-out
                 Quantity_Changed: quantity,
                 Timestamp: new Date().toISOString(),
                 Condition: 0, // 0 = Good, 1 = Needs_Repair, 2 = Broken
-                Optional_Notes: `Checked in by: ${userName}${notes ? ' - ' + notes : ''}`
+                Optional_Notes: `Signed out by: ${userName}${notes ? ' - ' + notes : ''}`
             };
 
             // Add transaction log
@@ -77,11 +88,11 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
             if (transactionResponse.ok) {
                 // Update equipment quantity
                 const updatedEquipment = {
-                    ...selectedEquipment,
-                    Item_Cnt: selectedEquipment.Item_Cnt + quantity
+                    ...selectedItem,
+                    Item_Cnt: selectedItem.Item_Cnt - quantity
                 };
 
-                const equipmentResponse = await fetch(`${API_URL}/update/${selectedEquipment.ID}`, {
+                const equipmentResponse = await fetch(`${API_URL}/update/${selectedId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -90,10 +101,10 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                 });
 
                 if (equipmentResponse.ok) {
-                    setStatus('Equipment successfully checked in!');
+                    setStatus('Equipment successfully signed out!');
                     setTimeout(() => {
                         onClose();
-                        if (onCheckIn) onCheckIn();
+                        if (onSignOut) onSignOut();
                     }, 1500);
                 } else {
                     throw new Error('Failed to update equipment quantity');
@@ -106,7 +117,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
         }
     };
 
-    if (!isOpen || !selectedEquipment) return null;
+    if (!isOpen) return null;
 
     return (
         <>
@@ -121,7 +132,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                 <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
                     {/* Modal Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-900">Check In Equipment</h2>
+                        <h2 className="text-xl font-bold text-gray-900">Sign Out Equipment</h2>
                         <button
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -132,14 +143,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
 
                     {/* Modal Body */}
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                        {/* Display Selected Equipment */}
-                        <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                            <p className="text-sm font-medium text-gray-700">Equipment:</p>
-                            <p className="text-lg font-semibold text-gray-900">{selectedEquipment.Name}</p>
-                            <p className="text-sm text-gray-600">Current Stock: {selectedEquipment.Item_Cnt}</p>
-                        </div>
-
-                        {/* User Name Field */}
+                        {/* User Name Field - Required First */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
                             <input
@@ -154,7 +158,28 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                             )}
                         </div>
 
-                        {/* Quantity Field */}
+                        {/* Equipment Selection - Disabled until name is entered */}
+                        {/* <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Select Equipment *</label>
+                            <select
+                                value={selectedId}
+                                onChange={(e) => setSelectedId(e.target.value)}
+                                className={`w-full px-3 py-2 bg-white border ${errors.equipment ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all disabled:bg-gray-50`}
+                                disabled={!userName.trim()}
+                            >
+                                <option value="">Select equipment...</option>
+                                {equipment.map(item => (
+                                    <option key={item.ID} value={item.ID} disabled={item.Item_Cnt === 0}>
+                                        {item.Name} (Available: {item.Item_Cnt})
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.equipment && (
+                                <p className="mt-1 text-sm text-red-600">{errors.equipment}</p>
+                            )}
+                        </div> */}
+
+                        {/* Quantity Field - Disabled until equipment is selected */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
                             <input
@@ -162,7 +187,9 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                                 value={quantity}
                                 onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
                                 min="1"
-                                className={`w-full px-3 py-2 bg-white border ${errors.quantity ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all`}
+                                max={selectedItem ? selectedItem.Item_Cnt : 1}
+                                className={`w-full px-3 py-2 bg-white border ${errors.quantity ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all disabled:bg-gray-50`}
+                                disabled={!selectedId}
                             />
                             {errors.quantity && (
                                 <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
@@ -175,9 +202,10 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all disabled:bg-gray-50"
                                 placeholder="Optional additional notes"
                                 rows="3"
+                                disabled={!selectedId}
                             />
                         </div>
 
@@ -200,9 +228,9 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                             <button
                                 type="submit"
                                 className="flex-1 py-2.5 px-4 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                disabled={!userName.trim() || status === 'Processing...'}
+                                disabled={!userName.trim() || !selectedId || status === 'Processing...'}
                             >
-                                {status === 'Processing...' ? 'Processing...' : 'Check In'}
+                                {status === 'Processing...' ? 'Processing...' : 'Sign Out Equipment'}
                             </button>
                         </div>
                     </form>
@@ -212,4 +240,4 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
     );
 };
 
-export default EquipmentCheckInModal;
+export default EquipmentSignOutModal;

@@ -9,29 +9,35 @@ const Header = ({
 }) => {
   return (
     <div className="mb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Real-Time Equipment Inventory</h1>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <select
-            value={selectedTable}
-            onChange={(e) => onTableChange(e.target.value)}
-            className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-          >
-            {Object.keys(tableControllers).map((key) => (
-              <option key={key} value={tableControllers[key]}>
-                {key}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={onGenerateReport}
-            disabled={reportStatus.includes("Generating")}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {reportStatus.includes("Generating") ? "Generating..." : "Generate History Report"}
-          </button>
-        </div>
+      <div className="mb-6 flex items-center gap-4">
+        <label htmlFor="view-selector" className="text-sm font-medium text-gray-700">
+          View:
+        </label>
+        <select
+          id="view-selector"
+          value={selectedTable}
+          onChange={(e) => onTableChange(e.target.value)}
+          className="w-[200px] px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        >
+          {Object.keys(tableControllers).map((key) => (
+            <option key={key} value={tableControllers[key]}>
+              {key}
+            </option>
+          ))}
+        </select>
       </div>
+      {selectedTable === 'Auditlog' && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Audit Log</h2>
+          <p className="text-gray-600">Track all system changes and administrative actions</p>
+        </div>
+      )}
+      {selectedTable === 'Transactionlog' && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Transaction Log</h2>
+          <p className="text-gray-600">View all equipment check-ins and check-outs</p>
+        </div>
+      )}
       {reportStatus && (
         <div
           className={`px-4 py-3 rounded-md text-sm font-medium ${

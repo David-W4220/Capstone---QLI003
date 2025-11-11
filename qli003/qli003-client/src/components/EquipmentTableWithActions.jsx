@@ -5,7 +5,8 @@ const EquipmentTableWithActions = ({
   onCheckout, 
   onCheckin, 
   onEdit, 
-  onDelete 
+  onDelete,
+  onRowClick
 }) => {
   const getStatusBadge = (item) => {
     const stock = item.Item_Cnt || 0
@@ -58,7 +59,8 @@ const EquipmentTableWithActions = ({
           {equipment.map((item, index) => (
             <tr 
               key={item.ID} 
-              className={index % 2 === 0 ? 'bg-white' : 'bg-blue-50'}
+              onClick={() => onRowClick && onRowClick(item)}
+              className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50'} hover:bg-blue-100 transition-colors cursor-pointer`}
             >
               <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900">{item.Name}</div>
@@ -81,25 +83,37 @@ const EquipmentTableWithActions = ({
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex gap-2">
                   <button
-                    onClick={() => onCheckout(item)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCheckout(item)
+                    }}
                     className="px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors"
                   >
                     Check Out
                   </button>
                   <button
-                    onClick={() => onCheckin(item)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onCheckin(item)
+                    }}
                     className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
                   >
                     Check In
                   </button>
                   <button
-                    onClick={() => onEdit(item)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit(item)
+                    }}
                     className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(item.ID)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(item.ID)
+                    }}
                     className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors"
                   >
                     Delete

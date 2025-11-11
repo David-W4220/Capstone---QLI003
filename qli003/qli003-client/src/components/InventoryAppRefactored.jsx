@@ -12,11 +12,14 @@ import EquipmentTableWithActions from "./EquipmentTableWithActions"
 import ErrorDisplay from "./ErrorDisplay"
 import EquipmentUpdateModal from "./EquipmentUpdateModal"
 import EquipmentDetailsModal from "./EquipmentDetailsModal"
-import EquipmentSignOutModal from "./EquipmentSignOutModal"
-import EquipmentAddModal from "./EquipmentAddModal"
 import EquipmentCheckOutModal from "./EquipmentCheckOutModal"
+import EquipmentAddModal from "./EquipmentAddModal"
 import EquipmentCheckInModal from "./EquipmentCheckInModal"
 import EquipmentEditModal from "./EquipmentEditModal"
+import AuditLogTable from "./AuditLogTable"
+import AuditLogDetailsModal from "./AuditLogDetailsModal"
+import TransactionLogTable from "./TransactionLogTable"
+import TransactionLogDetailsModal from "./TransactionLogDetailsModal"
 import useEquipmentData from "./useEquipmentData"
 import useReportGeneration from "./useReportGeneration"
 import useSignalR from "./useSignalR"
@@ -29,8 +32,8 @@ const HUB_URL = `${API_BASE_URL}/qliHub`
 const TABLE_CONTROLLERS = {
   Equipment: "Equipment",
   Admins: "Admins",
-  Auditlog: "Auditlog",
-  Transactionlog: "Transactionlog",
+  "Audit Log": "Auditlog",
+  "Transaction Log": "Transactionlog",
 }
 
 /**
@@ -50,11 +53,14 @@ const InventoryApp = () => {
   // Modal states
   const [detailsModalOpen, setDetailsModalOpen] = useState(false)
   const [signOutModalOpen, setSignOutModalOpen] = useState(false)
-  const [checkOutModalOpen, setCheckOutModalOpen] = useState(false)
   const [checkInModalOpen, setCheckInModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
+  const [auditLogDetailsOpen, setAuditLogDetailsOpen] = useState(false)
+  const [transactionLogDetailsOpen, setTransactionLogDetailsOpen] = useState(false)
   const [selectedEquipment, setSelectedEquipment] = useState(null)
+  const [selectedAuditLog, setSelectedAuditLog] = useState(null)
+  const [selectedTransactionLog, setSelectedTransactionLog] = useState(null)
 
   // Custom hooks
   const { equipment, loading, error, fetchEquipment } = useEquipmentData(API_URL)
@@ -83,6 +89,12 @@ const InventoryApp = () => {
     if (selectedTable === 'Equipment') {
       setSelectedEquipment(item)
       setDetailsModalOpen(true)
+    } else if (selectedTable === 'Auditlog') {
+      setSelectedAuditLog(item)
+      setAuditLogDetailsOpen(true)
+    } else if (selectedTable === 'Transactionlog') {
+      setSelectedTransactionLog(item)
+      setTransactionLogDetailsOpen(true)
     }
   }
 
@@ -120,21 +132,6 @@ const InventoryApp = () => {
     alert("Export functionality coming soon!")
   }
 
-  // Handle checkout from table
-  const handleCheckOutFromTable = (item) => {
-    setSelectedEquipment(item)
-    setCheckOutModalOpen(true)
-  }
-
-  // Handle checkout submission
-  const handleCheckOutSubmit = (quantity) => {
-    // TODO: Implement checkout logic
-    console.log(`Checking out ${quantity} of ${selectedEquipment?.Name}`)
-    setCheckOutModalOpen(false)
-    setSelectedEquipment(null)
-    // fetchEquipment() // Refresh after checkout
-  }
-
   // Handle inline table actions
   const handleCheckout = (item) => {
     setSelectedEquipment(item)
@@ -158,23 +155,6 @@ const InventoryApp = () => {
       // After successful delete:
       // fetchEquipment()
     }
-  }
-
-  // Handle check-in submission
-  const handleCheckInSubmit = (quantity) => {
-    if (!selectedEquipment) return
-    
-    // Update local state (no API call yet)
-    const updatedEquipment = equipment.map(item => 
-      item.Equipment_Id === selectedEquipment.Equipment_Id
-        ? { ...item, In_Stock: item.In_Stock + quantity }
-        : item
-    )
-    
-    console.log(`Checked in ${quantity} of ${selectedEquipment.Name}`)
-    setCheckInModalOpen(false)
-    setSelectedEquipment(null)
-    // fetchEquipment() // Uncomment when API is ready
   }
 
   // Handle edit submission
@@ -257,6 +237,19 @@ const InventoryApp = () => {
             onCheckin={handleCheckin}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onRowClick={handleRowClick}
+          />
+        ) : selectedTable === 'Auditlog' ? (
+          <AuditLogTable
+            logs={equipment}
+            loading={loading}
+            onRowClick={handleRowClick}
+          />
+        ) : selectedTable === 'Transactionlog' ? (
+          <TransactionLogTable
+            logs={equipment}
+            loading={loading}
+            onRowClick={handleRowClick}
           />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -289,10 +282,13 @@ const InventoryApp = () => {
           }}
         />
         
-        <EquipmentSignOutModal 
-          equipment={equipment}
+        <EquipmentCheckOutModal 
+          selectedEquipment={selectedEquipment}
           isOpen={signOutModalOpen}
-          onClose={() => setSignOutModalOpen(false)}
+          onClose={() => {
+            setSignOutModalOpen(false)
+            setSelectedEquipment(null)
+          }}
           onSignOut={fetchEquipment}
           API_URL={API_URL}
         />
@@ -304,25 +300,15 @@ const InventoryApp = () => {
           API_URL={API_URL}
         />
 
-        <EquipmentCheckOutModal
-          isOpen={checkOutModalOpen}
-          onClose={() => {
-            setCheckOutModalOpen(false)
-            setSelectedEquipment(null)
-          }}
-          equipment={selectedEquipment}
-          onCheckOut={handleCheckOutSubmit}
-          API_URL={API_URL}
-        />
-
         <EquipmentCheckInModal
+          selectedEquipment={selectedEquipment}
           isOpen={checkInModalOpen}
           onClose={() => {
             setCheckInModalOpen(false)
             setSelectedEquipment(null)
           }}
-          equipment={selectedEquipment}
-          onCheckIn={handleCheckInSubmit}
+          onCheckIn={fetchEquipment}
+          API_URL={API_URL}
         />
 
         <EquipmentEditModal
@@ -333,6 +319,24 @@ const InventoryApp = () => {
           }}
           equipment={selectedEquipment}
           onSave={handleEditSubmit}
+        />
+
+        <AuditLogDetailsModal
+          log={selectedAuditLog}
+          isOpen={auditLogDetailsOpen}
+          onClose={() => {
+            setAuditLogDetailsOpen(false)
+            setSelectedAuditLog(null)
+          }}
+        />
+
+        <TransactionLogDetailsModal
+          log={selectedTransactionLog}
+          isOpen={transactionLogDetailsOpen}
+          onClose={() => {
+            setTransactionLogDetailsOpen(false)
+            setSelectedTransactionLog(null)
+          }}
         />
       </div>
     </div>
