@@ -9,6 +9,18 @@ const Header = ({
 }) => {
   return (
     <div className="mb-8">
+      {selectedTable === 'Auditlog' && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Audit Log</h2>
+          <p className="text-gray-600">Track all system changes and administrative actions</p>
+        </div>
+      )}
+      {selectedTable === 'Transactionlog' && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Transaction Log</h2>
+          <p className="text-gray-600">View all equipment check-ins and check-outs</p>
+        </div>
+      )}
       <div className="mb-6 flex items-center gap-4">
         <label htmlFor="view-selector" className="text-sm font-medium text-gray-700">
           View:
@@ -26,18 +38,6 @@ const Header = ({
           ))}
         </select>
       </div>
-      {selectedTable === 'Auditlog' && (
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Audit Log</h2>
-          <p className="text-gray-600">Track all system changes and administrative actions</p>
-        </div>
-      )}
-      {selectedTable === 'Transactionlog' && (
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Transaction Log</h2>
-          <p className="text-gray-600">View all equipment check-ins and check-outs</p>
-        </div>
-      )}
       {reportStatus && (
         <div
           className={`px-4 py-3 rounded-md text-sm font-medium ${

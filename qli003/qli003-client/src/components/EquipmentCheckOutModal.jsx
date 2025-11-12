@@ -114,16 +114,24 @@ const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut,
         <>
             {/* Modal Backdrop */}
             <div 
-                className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 animate-fadeIn"
                 onClick={onClose}
             />
 
             {/* Modal Content */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slideUp">
                     {/* Modal Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-900">Check Out Equipment</h2>
+                        <div className="flex items-center gap-3">
+                            {/* Check Out Icon */}
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-gray-900">Check Out Equipment</h2>
+                        </div>
                         <button
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-600 text-2xl leading-none"

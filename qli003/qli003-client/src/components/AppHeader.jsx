@@ -12,7 +12,7 @@ const AppHeader = ({ currentUser, onLogout }) => {
         />
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-2">OT Closet Inventory</h1>
-          <p className="text-sm text-gray-600">Occupational Therapy Equipment Management System</p>
+          <p className="text-sm text-gray-600">Equipment Management System</p>
         </div>
       </div>
       <div className="flex items-center gap-4">

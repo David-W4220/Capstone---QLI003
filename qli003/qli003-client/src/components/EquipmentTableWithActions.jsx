@@ -60,7 +60,7 @@ const EquipmentTableWithActions = ({
             <tr 
               key={item.ID} 
               onClick={() => onRowClick && onRowClick(item)}
-              className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50'} hover:bg-blue-100 transition-colors cursor-pointer`}
+              className={`${index % 2 === 0 ? 'bg-white' : 'bg-white-50'} hover:bg-gray-100 transition-colors cursor-pointer`}
             >
               <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900">{item.Name}</div>
@@ -87,7 +87,7 @@ const EquipmentTableWithActions = ({
                       e.stopPropagation()
                       onCheckout(item)
                     }}
-                    className="px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors"
+                    className="px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors btn-scale"
                   >
                     Check Out
                   </button>
@@ -96,7 +96,7 @@ const EquipmentTableWithActions = ({
                       e.stopPropagation()
                       onCheckin(item)
                     }}
-                    className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors btn-scale"
                   >
                     Check In
                   </button>
@@ -105,16 +105,16 @@ const EquipmentTableWithActions = ({
                       e.stopPropagation()
                       onEdit(item)
                     }}
-                    className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors btn-scale"
                   >
                     Edit
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onDelete(item.ID)
+                      onDelete(item)
                     }}
-                    className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors"
+                    className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors btn-scale"
                   >
                     Delete
                   </button>

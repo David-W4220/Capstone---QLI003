@@ -1,29 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL, isOpen, onClose, preSelectedItem }) => {
+const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL }) => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedId, setSelectedId] = useState('');
     const [newDescription, setNewDescription] = useState('');
     const [status, setStatus] = useState('');
     const [errors, setErrors] = useState({});
-
-    // Support external control via isOpen prop
-    useEffect(() => {
-        if (isOpen !== undefined) {
-            setModalIsOpen(isOpen);
-            if (isOpen && preSelectedItem) {
-                setSelectedId(preSelectedItem.ID.toString());
-            }
-        }
-    }, [isOpen, preSelectedItem]);
-
-    // Close modal and call onClose callback if provided
-    const closeModal = () => {
-        setModalIsOpen(false);
-        if (onClose) {
-            onClose();
-        }
-    };
 
     const selectedItem = selectedId ? equipment.find(item => item.ID === parseInt(selectedId)) : null;
 
@@ -112,13 +94,13 @@ const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL, isOpen, onCl
                 <>
                     {/* Modal Backdrop */}
                     <div 
-                        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                        onClick={() => closeModal()}
+                        className="fixed inset-0 bg-black bg-opacity-50 z-40 animate-fadeIn"
+                        onClick={() => setModalIsOpen(false)}
                     />
 
                     {/* Modal Content */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slideUp">
                     {/* Modal Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                         <h2 className="text-lg font-semibold text-gray-900">Update Equipment</h2>
@@ -189,7 +171,7 @@ const EquipmentUpdateModal = ({ equipment, fetchEquipment, API_URL, isOpen, onCl
                             <button
                                 type="button"
                                 className="flex-1 py-2.5 px-4 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-                                onClick={() => closeModal()}
+                                onClick={() => setModalIsOpen(false)}
                             >
                                 Cancel
                             </button>

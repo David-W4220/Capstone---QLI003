@@ -112,16 +112,24 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
         <>
             {/* Modal Backdrop */}
             <div 
-                className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 animate-fadeIn"
                 onClick={onClose}
             />
 
             {/* Modal Content */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slideUp">
                     {/* Modal Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-900">Check In Equipment</h2>
+                        <div className="flex items-center gap-3">
+                            {/* Check In Icon */}
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
+                                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-gray-900">Check In Equipment</h2>
+                        </div>
                         <button
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -193,13 +201,13 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="flex-1 py-2.5 px-4 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
+                                className="flex-1 py-2.5 px-4 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors btn-scale"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 py-2.5 px-4 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 py-2.5 px-4 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors btn-scale"
                                 disabled={!userName.trim() || status === 'Processing...'}
                             >
                                 {status === 'Processing...' ? 'Processing...' : 'Check In'}

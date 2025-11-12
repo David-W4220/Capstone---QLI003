@@ -1,9 +1,33 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 const TransactionLogTable = ({ logs, loading, onRowClick }) => {
   const [sortOrder, setSortOrder] = useState("desc")
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
+  const [equipmentNames, setEquipmentNames] = useState({})
+
+  // Fetch equipment names to enrich transaction logs
+  useEffect(() => {
+    const fetchEquipmentNames = async () => {
+      try {
+        const response = await fetch('http://localhost:5097/api/Equipment')
+        if (response.ok) {
+          const equipment = await response.json()
+          const namesMap = {}
+          equipment.forEach(item => {
+            namesMap[item.ID] = item.Name
+          })
+          setEquipmentNames(namesMap)
+        }
+      } catch (error) {
+        console.error('Error fetching equipment names:', error)
+      }
+    }
+
+    if (logs.length > 0 && Object.keys(equipmentNames).length === 0) {
+      fetchEquipmentNames()
+    }
+  }, [logs, equipmentNames])
 
   const parseUserName = (notes) => {
     if (!notes) return "Unknown"
@@ -61,13 +85,23 @@ const TransactionLogTable = ({ logs, loading, onRowClick }) => {
     <div className="space-y-4">
       {/* Search and Filter Controls */}
       <div className="flex gap-4 items-center flex-wrap">
-        <input
-          type="text"
-          placeholder="Search by equipment name or user..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 min-w-[200px] h-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <div className="flex-1 min-w-[200px] relative">
+          <svg 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search by equipment name or user..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-10 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
@@ -87,7 +121,7 @@ const TransactionLogTable = ({ logs, loading, onRowClick }) => {
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+        <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
@@ -114,19 +148,19 @@ const TransactionLogTable = ({ logs, loading, onRowClick }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredLogs.map((log, index) => {
                 const isCheckIn = log.Check_In
-                const rowClass = index % 2 === 0 ? "bg-white hover:bg-blue-100" : "bg-blue-50 hover:bg-blue-100"
+                const equipmentName = equipmentNames[log.Equipment_ID] || log.EquipmentName || `Equipment #${log.Equipment_ID}`
 
                 return (
                   <tr
                     key={log.ID}
-                    onClick={() => onRowClick && onRowClick(log)}
-                    className={`${rowClass} transition-colors cursor-pointer`}
+                    onClick={() => onRowClick && onRowClick({ ...log, EquipmentName: equipmentName })}
+                    className="bg-white hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
                       {log.ID}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {log.EquipmentName || `Equipment #${log.Equipment_ID}`}
+                      {equipmentName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {isCheckIn ? (

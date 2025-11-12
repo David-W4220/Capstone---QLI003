@@ -1,10 +1,35 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 const AuditLogTable = ({ logs, loading, onRowClick }) => {
   const [sortOrder, setSortOrder] = useState("desc")
   const [searchTerm, setSearchTerm] = useState("")
+  const [adminNames, setAdminNames] = useState({})
+
+  // Fetch admin names to enrich audit logs
+  useEffect(() => {
+    const fetchAdminNames = async () => {
+      try {
+        const response = await fetch('http://localhost:5097/api/Admins')
+        if (response.ok) {
+          const admins = await response.json()
+          const namesMap = {}
+          admins.forEach(admin => {
+            namesMap[admin.ID] = admin.Name || `Admin ${admin.ID}`
+          })
+          setAdminNames(namesMap)
+        }
+      } catch (error) {
+        console.error('Error fetching admin names:', error)
+      }
+    }
+
+    if (logs.length > 0 && Object.keys(adminNames).length === 0) {
+      fetchAdminNames()
+    }
+  }, [logs, adminNames])
 
   const getActionType = (action) => {
+    if (!action) return "other"
     const actionLower = action.toLowerCase()
     if (actionLower.includes("add") || actionLower.includes("create")) return "add"
     if (actionLower.includes("update") || actionLower.includes("edit") || actionLower.includes("modify"))
@@ -30,9 +55,14 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
 
   const filteredLogs = logs
     .filter(
-      (log) =>
-        log.Act_Description?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        log.Admin_ID?.toString().includes(searchTerm)
+      (log) => {
+        const adminName = adminNames[log.Admin_ID] || ""
+        return (
+          log.Act_Description?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          log.Admin_ID?.toString().includes(searchTerm)
+        )
+      }
     )
     .sort((a, b) => {
       const dateA = new Date(a.Timestamp).getTime()
@@ -50,12 +80,8 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
     })
   }
 
-  const getRowClass = (action, index) => {
-    const actionType = getActionType(action)
-    if (actionType === "add") return "bg-green-50 hover:bg-green-100"
-    if (actionType === "update") return "bg-blue-50 hover:bg-blue-100"
-    if (actionType === "delete") return "bg-red-50 hover:bg-red-100"
-    return index % 2 === 0 ? "bg-white hover:bg-blue-100" : "bg-blue-50 hover:bg-blue-100"
+  const getRowClass = () => {
+    return "bg-white hover:bg-gray-100"
   }
 
   if (loading) {
@@ -78,13 +104,23 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
     <div className="space-y-4">
       {/* Search and Sort Controls */}
       <div className="flex gap-4 items-center">
-        <input
-          type="text"
-          placeholder="Search by admin ID or action..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 h-10 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <div className="flex-1 relative">
+          <svg 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search by admin ID or action..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full h-10 pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         <button
           onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
           className="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors whitespace-nowrap"
@@ -95,7 +131,7 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+        <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
@@ -118,13 +154,13 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
                 <tr
                   key={log.ID}
                   onClick={() => onRowClick && onRowClick(log)}
-                  className={`${getRowClass(log.Act_Description, index)} transition-colors cursor-pointer`}
+                  className={`${getRowClass()} transition-colors cursor-pointer`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
                     {log.ID}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {log.Admin_ID}
+                    {adminNames[log.Admin_ID] || `Admin ${log.Admin_ID}`}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="flex items-center gap-2">

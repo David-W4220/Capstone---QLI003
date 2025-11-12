@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import AppHeader from "./AppHeader"
 import Header from "./Header"
+import LowStockAlert from "./LowStockAlert"
 import DashboardStats from "./DashboardStats"
 import SearchAndFilter from "./SearchAndFilter"
 import ActionButtonsBar from "./ActionButtonsBar"
@@ -16,6 +17,7 @@ import EquipmentCheckOutModal from "./EquipmentCheckOutModal"
 import EquipmentAddModal from "./EquipmentAddModal"
 import EquipmentCheckInModal from "./EquipmentCheckInModal"
 import EquipmentEditModal from "./EquipmentEditModal"
+import EquipmentDeleteModal from "./EquipmentDeleteModal"
 import AuditLogTable from "./AuditLogTable"
 import AuditLogDetailsModal from "./AuditLogDetailsModal"
 import TransactionLogTable from "./TransactionLogTable"
@@ -56,6 +58,7 @@ const InventoryApp = () => {
   const [checkInModalOpen, setCheckInModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [auditLogDetailsOpen, setAuditLogDetailsOpen] = useState(false)
   const [transactionLogDetailsOpen, setTransactionLogDetailsOpen] = useState(false)
   const [selectedEquipment, setSelectedEquipment] = useState(null)
@@ -149,29 +152,100 @@ const InventoryApp = () => {
   }
 
   const handleDelete = (item) => {
-    if (window.confirm(`Are you sure you want to delete "${item.Name}"?`)) {
-      // TODO: Implement delete API call
-      console.log("Deleting item:", item.Equipment_Id)
-      // After successful delete:
-      // fetchEquipment()
+    setSelectedEquipment(item)
+    setDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async (item) => {
+    try {
+      const equipmentId = item.Equipment_Id || item.ID
+      const response = await fetch(`${API_URL}/delete/${equipmentId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        console.log("Equipment deleted successfully")
+        
+        // Create audit log entry for equipment deletion
+        const auditLog = {
+          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Act_Description: `Deleted equipment: ${item.Name} (ID: ${equipmentId})`,
+          Timestamp: new Date().toISOString()
+        }
+
+        await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(auditLog),
+        })
+
+        fetchEquipment() // Refresh data
+      } else {
+        console.error("Failed to delete equipment")
+        alert("Failed to delete equipment. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error deleting equipment:", error)
+      alert("Error deleting equipment. Please try again.")
     }
   }
 
   // Handle edit submission
-  const handleEditSubmit = (formData) => {
+  const handleEditSubmit = async (formData) => {
     if (!selectedEquipment) return
     
-    // Update local state (no API call yet)
-    const updatedEquipment = equipment.map(item =>
-      item.Equipment_Id === selectedEquipment.Equipment_Id
-        ? { ...item, ...formData }
-        : item
-    )
-    
-    console.log("Updated equipment:", { ...selectedEquipment, ...formData })
-    setEditModalOpen(false)
-    setSelectedEquipment(null)
-    // fetchEquipment() // Uncomment when API is ready
+    try {
+      // Prepare full equipment object for API
+      const updateData = {
+        ID: selectedEquipment.Equipment_Id || selectedEquipment.ID,
+        Name: formData.Name,
+        Description: formData.Description,
+        Item_Cnt: selectedEquipment.Item_Cnt,
+        Alpha_Loc: formData.Location,
+        Threshold: parseInt(formData.Threshold) || 0,
+        ReodrLk_Pri_Qty: formData.ReorderLink,
+        BuyQty: selectedEquipment.BuyQty
+      }
+
+      const response = await fetch(`${API_URL}/update/${updateData.ID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      })
+
+      if (response.ok) {
+        console.log("Equipment updated successfully")
+        
+        // Create audit log entry for equipment update
+        const auditLog = {
+          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Act_Description: `Updated equipment: ${updateData.Name} (ID: ${updateData.ID})`,
+          Timestamp: new Date().toISOString()
+        }
+
+        await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(auditLog),
+        })
+
+        setEditModalOpen(false)
+        setSelectedEquipment(null)
+        fetchEquipment() // Refresh data
+      } else {
+        console.error("Failed to update equipment")
+        alert("Failed to update equipment. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error updating equipment:", error)
+      alert("Error updating equipment. Please try again.")
+    }
   }
 
   if (error) {
@@ -187,6 +261,14 @@ const InventoryApp = () => {
           onLogout={handleLogout}
         />
 
+        {/* Low Stock Alert - Only show for Equipment table */}
+        {selectedTable === 'Equipment' && (
+          <LowStockAlert
+            lowStockCount={lowStockCount}
+            onViewLowStock={handleViewLowStock}
+          />
+        )}
+
         {/* Table Selection and Report Header */}
         <Header
           selectedTable={selectedTable}
@@ -196,12 +278,11 @@ const InventoryApp = () => {
           tableControllers={TABLE_CONTROLLERS}
         />
 
-        {/* Dashboard Stats - Only show for Equipment table */}
+        {/* Dashboard Stats Cards - Only show for Equipment table */}
         {selectedTable === 'Equipment' && (
           <DashboardStats
             equipment={equipment}
             lowStockCount={lowStockCount}
-            onViewLowStock={handleViewLowStock}
           />
         )}
 
@@ -319,6 +400,16 @@ const InventoryApp = () => {
           }}
           equipment={selectedEquipment}
           onSave={handleEditSubmit}
+        />
+
+        <EquipmentDeleteModal
+          equipment={selectedEquipment}
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+          onConfirm={handleConfirmDelete}
         />
 
         <AuditLogDetailsModal

@@ -13,6 +13,7 @@ React components and custom hooks for the QLI003 Inventory Application.
 - **AppHeader.jsx** - Logo, user info, logout button
 - **Header.jsx** - View selector dropdown (Equipment, Admins, Audit Log, Transaction Log)
 - **DashboardStats.jsx** - Statistics cards and low stock alerts
+- **LowStockAlert.jsx** - Inline alert for low stock equipment, used in dashboard and tables
 - **ActionButtonsBar.jsx** - Add Equipment, Export, Generate Report buttons
 - **SearchAndFilter.jsx** - Search bar and filter controls
 - **EquipmentTable.jsx** - Basic data table with dynamic columns
@@ -25,8 +26,9 @@ React components and custom hooks for the QLI003 Inventory Application.
 ### Modal Components
 - **EquipmentAddModal.jsx** - Add new equipment form
 - **EquipmentEditModal.jsx** - Edit equipment details (Name, Description, Location, Threshold, Vendor Link)
-- **EquipmentCheckOutModal.jsx** - Simplified checkout with quantity input (no equipment selector)
+- **EquipmentCheckOutModal.jsx** - Simplified checkout with quantity input
 - **EquipmentCheckInModal.jsx** - Check in equipment with quantity input and transaction logging
+- **EquipmentDeleteModal.jsx** - Confirmation modal for deleting equipment
 - **EquipmentDetailsModal.jsx** - View detailed equipment information
 - **AuditLogDetailsModal.jsx** - View full audit log entry details
 - **TransactionLogDetailsModal.jsx** - View full transaction details with parsed user info
@@ -46,13 +48,6 @@ React components and custom hooks for the QLI003 Inventory Application.
 - **useSignalR.js** - Manages SignalR real-time connection for live updates
 - **useLowStockCount.js** - Calculates number of items below threshold
 - **useEquipmentFilter.js** - Search and filter logic (returns: filtered data, search/filter state and setters)
-
-## Quick Start
-
-Update `App.js` to use the refactored component:
-```javascript
-import InventoryApp from './components/InventoryAppRefactored';
-```
 
 ## Key Features
 
@@ -78,3 +73,5 @@ import InventoryApp from './components/InventoryAppRefactored';
 - **Email Notifications for Inventory Changes** - Send email notifications for inventory changes (checkout/checkin)
 - **Automated Reorder Suggestions** - Create automated reorder suggestions with vendor links
 - **Email Summaries** - Notification of changes on dashboard / Email summary
+
+
