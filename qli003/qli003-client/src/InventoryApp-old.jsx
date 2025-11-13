@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 const API_BASE_URL = 'http://localhost:5097'; // Change the API_Base_URL to your hosts IP. 
 // IE: from localhost to 192.168.X.X or the like
-    //const API_CONTROLLER = 'QLIDb'; We have 5 controllers now
+//const API_CONTROLLER = 'QLIDb'; We have 5 controllers now
 const HUB_URL = `${API_BASE_URL}/qliHub`;
 const TABLE_CONTROLLERS = 
 {
@@ -83,10 +83,10 @@ const EquipmentUpdateForm = ({ equipment, fetchEquipment, API_URL }) => {
                     >
                         <option value="">-- Choose an item --</option>
                         {equipment && equipment.map(item => (
-                            <option key={item.ID} value={item.ID}>
-                                {item.Name} (ID: {item.ID}) - Stock: {item.Item_Cnt} @ {item.Alpha_Loc}
-                            </option>
-                        ))}
+                            <option key={item.ID} value={item.ID}>
+                                {item.Name} (ID: {item.ID}) - Stock: {item.Item_Cnt} @ {item.Alpha_Loc}
+                            </option>
+                            ))}
                     </select>
                 </div>
 
@@ -182,19 +182,19 @@ const InventoryApp = () => {
                 return;
             }
 
-            // --- SignalR Connection Logic ---
+            // SignalR Connection Logic
             connection = new signalR.HubConnectionBuilder()
                 .withUrl(HUB_URL)
                 .withAutomaticReconnect()
                 .build();
 
-            // 2. Set up the listener BEFORE starting the connection
+            // Set up the listener BEFORE starting the connection
             connection.on("RefreshData", () => {
                 console.log("Refresh signal received. Re-fetching data...");
                 fetchEquipment();
             });
 
-            // 3. Start the connection
+            // Start the connection
             try {
                 await connection.start();
                 console.log("SignalR Connected successfully.");
@@ -205,7 +205,7 @@ const InventoryApp = () => {
 
         startSignalRConnection();
 
-        // 4. Cleanup function: Stop the connection when the component unmounts
+        // Cleanup function: Stop the connection when the component unmounts
         return () => {
             if (connection) {
                 connection.stop();
