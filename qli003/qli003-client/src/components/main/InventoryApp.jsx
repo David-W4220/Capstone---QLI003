@@ -1,32 +1,31 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import AppHeader from "./AppHeader"
-import Header from "./Header"
-import LowStockAlert from "./LowStockAlert"
-import DashboardStats from "./DashboardStats"
-import SearchAndFilter from "./SearchAndFilter"
-import ActionButtonsBar from "./ActionButtonsBar"
-import ActionButtons from "./ActionButtons"
-import EquipmentTable from "./EquipmentTable"
-import EquipmentTableWithActions from "./EquipmentTableWithActions"
-import ErrorDisplay from "./ErrorDisplay"
-import EquipmentUpdateModal from "./EquipmentUpdateModal"
-import EquipmentDetailsModal from "./EquipmentDetailsModal"
-import EquipmentCheckOutModal from "./EquipmentCheckOutModal"
-import EquipmentAddModal from "./EquipmentAddModal"
-import EquipmentCheckInModal from "./EquipmentCheckInModal"
-import EquipmentEditModal from "./EquipmentEditModal"
-import EquipmentDeleteModal from "./EquipmentDeleteModal"
-import AuditLogTable from "./AuditLogTable"
-import AuditLogDetailsModal from "./AuditLogDetailsModal"
-import TransactionLogTable from "./TransactionLogTable"
-import TransactionLogDetailsModal from "./TransactionLogDetailsModal"
-import useEquipmentData from "./useEquipmentData"
-import useReportGeneration from "./useReportGeneration"
-import useSignalR from "./useSignalR"
-import useLowStockCount from "./useLowStockCount"
-import useEquipmentFilter from "./useEquipmentFilter"
+import AppHeader from "../layout/AppHeader"
+import Header from "../layout/Header"
+import LowStockAlert from "../ui/LowStockAlert"
+import DashboardStats from "../ui/DashboardStats"
+import SearchAndFilter from "../ui/SearchAndFilter"
+import ActionButtonsBar from "../ui/ActionButtonsBar"
+import EquipmentTable from "../tables/EquipmentTable"
+import EquipmentTableWithActions from "../tables/EquipmentTableWithActions"
+import ErrorDisplay from "../ui/ErrorDisplay"
+import EquipmentUpdateModal from "../modals/EquipmentUpdateModal"
+import EquipmentDetailsModal from "../modals/EquipmentDetailsModal"
+import EquipmentCheckOutModal from "../modals/EquipmentCheckOutModal"
+import EquipmentAddModal from "../modals/EquipmentAddModal"
+import EquipmentCheckInModal from "../modals/EquipmentCheckInModal"
+import EquipmentEditModal from "../modals/EquipmentEditModal"
+import EquipmentDeleteModal from "../modals/EquipmentDeleteModal"
+import AuditLogTable from "../tables/AuditLogTable"
+import AuditLogDetailsModal from "../modals/AuditLogDetailsModal"
+import TransactionLogTable from "../tables/TransactionLogTable"
+import TransactionLogDetailsModal from "../modals/TransactionLogDetailsModal"
+import useEquipmentData from "../hooks/useEquipmentData"
+import useReportGeneration from "../hooks/useReportGeneration"
+import useSignalR from "../hooks/useSignalR"
+import useLowStockCount from "../hooks/useLowStockCount"
+import useEquipmentFilter from "../hooks/useEquipmentFilter"
 
 const API_BASE_URL = "http://localhost:5097" // Change the API_Base_URL to your hosts IP.
 // IE: from localhost to 192.168.X.X or the like
@@ -333,23 +332,8 @@ const InventoryApp = () => {
             onRowClick={handleRowClick}
           />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Action Buttons - Left Column */}
-            <ActionButtons
-              onCheckOut={handleCheckOut}
-              EquipmentUpdateModal={EquipmentUpdateModal}
-              equipment={equipment}
-              fetchEquipment={fetchEquipment}
-              apiUrl={API_URL}
-            />
-
-            {/* Data Table - Right Column */}
-            <EquipmentTable
-              selectedTable={selectedTable}
-              equipment={equipment}
-              loading={loading}
-              onRowClick={handleRowClick}
-            />
+          <div className="text-center py-8 text-gray-500">
+            <p>No table selected</p>
           </div>
         )}
 

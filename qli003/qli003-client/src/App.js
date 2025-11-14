@@ -1,5 +1,5 @@
 import React from 'react';
-import InventoryApp from './components/InventoryAppRefactored';
+import InventoryApp from './components/main/InventoryApp';
 
 function App() {
   return (
