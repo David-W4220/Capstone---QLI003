@@ -116,8 +116,8 @@ Merge austin's three new modal components with Tailwind CSS (no external depende
 - Select equipment and modify description
 - Changes save and refresh automatically
 
-### Sign Out Equipment
-- Click "Sign Out Equipment" button
+### Check Out Equipment
+- Click "Checkout Equipment" button
 - Enter your name (required)
 - Select equipment and quantity
 - Optionally add notes

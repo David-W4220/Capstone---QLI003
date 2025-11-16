@@ -1,0 +1,421 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import AppHeader from "../layout/AppHeader"
+import Header from "../layout/Header"
+import LowStockAlert from "../ui/LowStockAlert"
+import DashboardStats from "../ui/DashboardStats"
+import SearchAndFilter from "../ui/SearchAndFilter"
+import ActionButtonsBar from "../ui/ActionButtonsBar"
+import EquipmentTable from "../tables/EquipmentTable"
+import EquipmentTableWithActions from "../tables/EquipmentTableWithActions"
+import ErrorDisplay from "../ui/ErrorDisplay"
+import EquipmentUpdateModal from "../modals/EquipmentUpdateModal"
+import EquipmentDetailsModal from "../modals/EquipmentDetailsModal"
+import EquipmentCheckOutModal from "../modals/EquipmentCheckOutModal"
+import EquipmentAddModal from "../modals/EquipmentAddModal"
+import EquipmentCheckInModal from "../modals/EquipmentCheckInModal"
+import EquipmentEditModal from "../modals/EquipmentEditModal"
+import EquipmentDeleteModal from "../modals/EquipmentDeleteModal"
+import AuditLogTable from "../tables/AuditLogTable"
+import AuditLogDetailsModal from "../modals/AuditLogDetailsModal"
+import TransactionLogTable from "../tables/TransactionLogTable"
+import TransactionLogDetailsModal from "../modals/TransactionLogDetailsModal"
+import useEquipmentData from "../hooks/useEquipmentData"
+import useReportGeneration from "../hooks/useReportGeneration"
+import useSignalR from "../hooks/useSignalR"
+import useLowStockCount from "../hooks/useLowStockCount"
+import useEquipmentFilter from "../hooks/useEquipmentFilter"
+
+const API_BASE_URL = "http://localhost:5097" // Change the API_Base_URL to your hosts IP.
+// IE: from localhost to 192.168.X.X or the like
+const HUB_URL = `${API_BASE_URL}/qliHub`
+const TABLE_CONTROLLERS = {
+  Equipment: "Equipment",
+  Admins: "Admins",
+  "Audit Log": "Auditlog",
+  "Transaction Log": "Transactionlog",
+}
+
+/**
+ * InventoryApp (Main Component)
+ * Manages state, data fetching, and SignalR connection.
+ */
+const InventoryApp = () => {
+  // User authentication state
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [currentUser, setCurrentUser] = useState("Admin User")
+
+  // State for which table is currently selected
+  const [selectedTable, setSelectedTable] = useState("Equipment")
+  const API_URL = `${API_BASE_URL}/api/${selectedTable}`
+  const REPORT_API_URL = `${API_BASE_URL}/api/report/send`
+
+  // Modal states
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false)
+  const [signOutModalOpen, setSignOutModalOpen] = useState(false)
+  const [checkInModalOpen, setCheckInModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [auditLogDetailsOpen, setAuditLogDetailsOpen] = useState(false)
+  const [transactionLogDetailsOpen, setTransactionLogDetailsOpen] = useState(false)
+  const [selectedEquipment, setSelectedEquipment] = useState(null)
+  const [selectedAuditLog, setSelectedAuditLog] = useState(null)
+  const [selectedTransactionLog, setSelectedTransactionLog] = useState(null)
+
+  // Custom hooks
+  const { equipment, loading, error, fetchEquipment } = useEquipmentData(API_URL)
+  const { reportStatus, handleGenerateReport } = useReportGeneration(REPORT_API_URL)
+  const lowStockCount = useLowStockCount(equipment)
+  const {
+    searchTerm,
+    setSearchTerm,
+    filterStatus,
+    setFilterStatus,
+    filterLocation,
+    setFilterLocation,
+    filteredEquipment
+  } = useEquipmentFilter(equipment)
+
+  // Fetch equipment when component mounts or API_URL changes
+  useEffect(() => {
+    fetchEquipment()
+  }, [fetchEquipment])
+
+  // SignalR real-time updates
+  useSignalR(HUB_URL, fetchEquipment)
+
+  // Handle table row click
+  const handleRowClick = (item) => {
+    if (selectedTable === 'Equipment') {
+      setSelectedEquipment(item)
+      setDetailsModalOpen(true)
+    } else if (selectedTable === 'Auditlog') {
+      setSelectedAuditLog(item)
+      setAuditLogDetailsOpen(true)
+    } else if (selectedTable === 'Transactionlog') {
+      setSelectedTransactionLog(item)
+      setTransactionLogDetailsOpen(true)
+    }
+  }
+
+  // Handle check out button click
+  const handleCheckOut = () => {
+    setSignOutModalOpen(true)
+  }
+
+  // Handle table selection change
+  const handleTableChange = (table) => {
+    setSelectedTable(table)
+  }
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    // Add logout logic here (clear tokens, redirect, etc.)
+  }
+
+  // Handle view low stock items
+  const handleViewLowStock = () => {
+    // Set filter to show only low stock items
+    setFilterStatus("low")
+  }
+
+  // Handle add equipment
+  const handleAddEquipment = () => {
+    setAddModalOpen(true)
+  }
+
+  // Handle export report
+  const handleExportReport = () => {
+    // TODO: Implement export logic
+    console.log("Exporting report...")
+    alert("Export functionality coming soon!")
+  }
+
+  // Handle inline table actions
+  const handleCheckout = (item) => {
+    setSelectedEquipment(item)
+    setSignOutModalOpen(true)
+  }
+
+  const handleCheckin = (item) => {
+    setSelectedEquipment(item)
+    setCheckInModalOpen(true)
+  }
+
+  const handleEdit = (item) => {
+    setSelectedEquipment(item)
+    setEditModalOpen(true)
+  }
+
+  const handleDelete = (item) => {
+    setSelectedEquipment(item)
+    setDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async (item) => {
+    try {
+      const equipmentId = item.Equipment_Id || item.ID
+      const response = await fetch(`${API_URL}/delete/${equipmentId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        console.log("Equipment deleted successfully")
+        
+        // Create audit log entry for equipment deletion
+        const auditLog = {
+          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Act_Description: `Deleted equipment: ${item.Name} (ID: ${equipmentId})`,
+          Timestamp: new Date().toISOString()
+        }
+
+        await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(auditLog),
+        })
+
+        fetchEquipment() // Refresh data
+      } else {
+        console.error("Failed to delete equipment")
+        alert("Failed to delete equipment. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error deleting equipment:", error)
+      alert("Error deleting equipment. Please try again.")
+    }
+  }
+
+  // Handle edit submission
+  const handleEditSubmit = async (formData) => {
+    if (!selectedEquipment) return
+    
+    try {
+      // Prepare full equipment object for API
+      const updateData = {
+        ID: selectedEquipment.Equipment_Id || selectedEquipment.ID,
+        Name: formData.Name,
+        Description: formData.Description,
+        Item_Cnt: selectedEquipment.Item_Cnt,
+        Alpha_Loc: formData.Location,
+        Threshold: parseInt(formData.Threshold) || 0,
+        ReodrLk_Pri_Qty: formData.ReorderLink,
+        BuyQty: selectedEquipment.BuyQty
+      }
+
+      const response = await fetch(`${API_URL}/update/${updateData.ID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      })
+
+      if (response.ok) {
+        console.log("Equipment updated successfully")
+        
+        // Create audit log entry for equipment update
+        const auditLog = {
+          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Act_Description: `Updated equipment: ${updateData.Name} (ID: ${updateData.ID})`,
+          Timestamp: new Date().toISOString()
+        }
+
+        await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(auditLog),
+        })
+
+        setEditModalOpen(false)
+        setSelectedEquipment(null)
+        fetchEquipment() // Refresh data
+      } else {
+        console.error("Failed to update equipment")
+        alert("Failed to update equipment. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error updating equipment:", error)
+      alert("Error updating equipment. Please try again.")
+    }
+  }
+
+  if (error) {
+    return <ErrorDisplay error={error} />
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* App Header with Logo and User Info */}
+        <AppHeader 
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
+
+        {/* Low Stock Alert - Only show for Equipment table */}
+        {selectedTable === 'Equipment' && (
+          <LowStockAlert
+            lowStockCount={lowStockCount}
+            onViewLowStock={handleViewLowStock}
+          />
+        )}
+
+        {/* Table Selection and Report Header */}
+        <Header
+          selectedTable={selectedTable}
+          onTableChange={handleTableChange}
+          onGenerateReport={handleGenerateReport}
+          reportStatus={reportStatus}
+          tableControllers={TABLE_CONTROLLERS}
+        />
+
+        {/* Dashboard Stats Cards - Only show for Equipment table */}
+        {selectedTable === 'Equipment' && (
+          <DashboardStats
+            equipment={equipment}
+            lowStockCount={lowStockCount}
+          />
+        )}
+
+        {/* Action Buttons Bar - Only show for Equipment table */}
+        {selectedTable === 'Equipment' && (
+          <ActionButtonsBar
+            onAddEquipment={handleAddEquipment}
+            onExportReport={handleExportReport}
+            onGenerateHistoryReport={handleGenerateReport}
+            isGeneratingReport={reportStatus.includes("Generating")}
+          />
+        )}
+
+        {/* Search and Filter - Only show for Equipment table */}
+        {selectedTable === 'Equipment' && (
+          <SearchAndFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            filterStatus={filterStatus}
+            onFilterStatusChange={setFilterStatus}
+            filterLocation={filterLocation}
+            onFilterLocationChange={setFilterLocation}
+            equipment={equipment}
+          />
+        )}
+
+        {/* Main Content - Full Width Table with Actions */}
+        {selectedTable === 'Equipment' ? (
+          <EquipmentTableWithActions
+            equipment={filteredEquipment}
+            loading={loading}
+            onCheckout={handleCheckout}
+            onCheckin={handleCheckin}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onRowClick={handleRowClick}
+          />
+        ) : selectedTable === 'Auditlog' ? (
+          <AuditLogTable
+            logs={equipment}
+            loading={loading}
+            onRowClick={handleRowClick}
+          />
+        ) : selectedTable === 'Transactionlog' ? (
+          <TransactionLogTable
+            logs={equipment}
+            loading={loading}
+            onRowClick={handleRowClick}
+          />
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <p>No table selected</p>
+          </div>
+        )}
+
+        {/* Modals */}
+        <EquipmentDetailsModal 
+          equipment={selectedEquipment}
+          isOpen={detailsModalOpen}
+          onClose={() => {
+            setDetailsModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+        />
+        
+        <EquipmentCheckOutModal 
+          selectedEquipment={selectedEquipment}
+          isOpen={signOutModalOpen}
+          onClose={() => {
+            setSignOutModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+          onSignOut={fetchEquipment}
+          API_URL={API_URL}
+        />
+
+        <EquipmentAddModal
+          isOpen={addModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          onAdd={fetchEquipment}
+          API_URL={API_URL}
+        />
+
+        <EquipmentCheckInModal
+          selectedEquipment={selectedEquipment}
+          isOpen={checkInModalOpen}
+          onClose={() => {
+            setCheckInModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+          onCheckIn={fetchEquipment}
+          API_URL={API_URL}
+        />
+
+        <EquipmentEditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+          equipment={selectedEquipment}
+          onSave={handleEditSubmit}
+        />
+
+        <EquipmentDeleteModal
+          equipment={selectedEquipment}
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false)
+            setSelectedEquipment(null)
+          }}
+          onConfirm={handleConfirmDelete}
+        />
+
+        <AuditLogDetailsModal
+          log={selectedAuditLog}
+          isOpen={auditLogDetailsOpen}
+          onClose={() => {
+            setAuditLogDetailsOpen(false)
+            setSelectedAuditLog(null)
+          }}
+        />
+
+        <TransactionLogDetailsModal
+          log={selectedTransactionLog}
+          isOpen={transactionLogDetailsOpen}
+          onClose={() => {
+            setTransactionLogDetailsOpen(false)
+            setSelectedTransactionLog(null)
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+export default InventoryApp
