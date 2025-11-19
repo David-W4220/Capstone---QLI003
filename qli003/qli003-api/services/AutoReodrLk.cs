@@ -10,8 +10,8 @@ public class AutoReodrLk : BackgroundService
     //private readonly QLIDbContext _context;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _config;
-    //private readonly TimeSpan _interval = TimeSpan.FromDays(7); // test interval: FromSeconds(30)
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _interval = TimeSpan.FromDays(7);// <- EDIT RESENT INTERVAL BY DAYS HERE
+    //private readonly TimeSpan _interval = TimeSpan.FromSeconds(30); // test interval: FromSeconds(30)
 
     //public AutoReodrLk(QLIDbContext context, IConfiguration config)
     public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config)
@@ -81,11 +81,10 @@ public class AutoReodrLk : BackgroundService
         int index = 1;
         foreach (var e in lowList)
         {
-            //display "Not Available Yet" or a clickable link
             htmlTable +=
                 $"<tr><td>{index}</td>" +
                 $"<td>{e.Name}</td>" +
-                $"<td style='word-break: break-all;'>" +
+                $"<td style='word-break: break-all;'>" + //display "Not Available Yet" or a clickable link
                 $"{(string.IsNullOrEmpty(e.ReodrLk_Pri_Qty) ? "Not Available Yet" : $"<a href='{e.ReodrLk_Pri_Qty}'>{e.ReodrLk_Pri_Qty}</a>")}" +
                 $"<td>{e.BuyQty}</td></tr>";
             index++;
