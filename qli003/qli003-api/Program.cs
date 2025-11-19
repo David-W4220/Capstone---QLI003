@@ -41,7 +41,7 @@ builder.Services.AddCors(options =>
 
 
 //Register two mail services
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<HistoryPDF>();
 //builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
 builder.Services.AddHostedService<AutoReodrLk>();
 
