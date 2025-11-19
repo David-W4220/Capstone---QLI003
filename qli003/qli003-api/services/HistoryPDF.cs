@@ -3,12 +3,12 @@ using MimeKit;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-public class EmailService
+public class HistoryPDF
     {
         private readonly QLIDbContext _context;
         private readonly IConfiguration _config;
 
-        public EmailService(QLIDbContext context, IConfiguration config)
+        public HistoryPDF(QLIDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
