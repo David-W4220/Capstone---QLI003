@@ -40,8 +40,11 @@ builder.Services.AddCors(options =>
 });
 
 
-//Register new mail service
+//Register two mail services
 builder.Services.AddScoped<EmailService>();
+//builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
+builder.Services.AddHostedService<AutoReodrLk>();
+
 
 //Tells the application to listen to all IPs on this port
 builder.WebHost.UseUrls("http://0.0.0.0:5097");
