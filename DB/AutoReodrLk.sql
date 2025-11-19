@@ -99,21 +99,20 @@ LOCK TABLES `equipment` WRITE;
 /*!40000 ALTER TABLE `equipment` DISABLE KEYS */;
 INSERT INTO `equipment` VALUES 
 #Avaliable(SHOULD'NT SHOW IN MAIL)
-(1,'Red Foam','Cut to size for built up handles',3,'https://www.amazon.com/Rehabilitation-Advantage-Tubing-Support-Utensils/dp/B07DGMXTXP/ref=sr_1_7?crid=37226DT0C2WFF&dib=eyJ2IjoiMSJ9.YC-BBxZpwRkc9_3l-hbjFyFC-fWR1vPt6Ar-T41iN5HECuFWOLJyQ-9ICVSNiQhNUpRldtJMAne76rZomhovHA7XsjioOQ3tCZUq4zEo8THYM85XwhPxWq5KXozkHI9gcMItxCHzQ2V8SuLbtLp5B1rXhsrM-ESmY5a77fbMhUs33RdJhuQKnoFbJuMEod693LbCDy1NSL0tyX53iaQZrbdKPB1MvhwajFoOMijrCyTAJcykDs9uzcoWusHXUwiJkv9wKiUQSYSQM2WLzE3kUKgnaeMHMWu89s5WKdEvcbRCGT7jLEG19FEtcIUTIEAS93z0vwcotZZYJLZou66hQymWFBtPg-ZW_OqGOyn0ebAju2wE_kPWyWW_SLJmIoKKXozcNPg40XHOIGCNX9OTIMnY0sMX2dU0ArZ7PjHIIypv-pPLKMzawftVnEZeOV1t.a-A4TodjuK_QFZsJPQyL_rOx5ONsZPaiZvWlhh_yROY&dib_tag=se&keywords=red+foam+built+up+handles&qid=1742326681&sprefix=red+foam+built+up+%2Caps%2C99&sr=8-7(6 pack for $17.04)','One 6 Pack',6,'L-3-R'),
+(1,'Red Foam','Cut to size for built up handles',3,'https://www.amazon.com/Rehabilitation-Advantage-Tubing-Support-Utensils/dp/B07DGMXTXP/ref=sr_1_7?crid=37226DT0C2WFF&dib=eyJ2IjoiMSJ9.YC-BBxZpwRkc9_3l-hbjFyFC-fWR1vPt6Ar-T41iN5HECuFWOLJyQ-9ICVSNiQhNUpRldtJMAne76rZomhovHA7XsjioOQ3tCZUq4zEo8THYM85XwhPxWq5KXozkHI9gcMItxCHzQ2V8SuLbtLp5B1rXhsrM-ESmY5a77fbMhUs33RdJhuQKnoFbJuMEod693LbCDy1NSL0tyX53iaQZrbdKPB1MvhwajFoOMijrCyTAJcykDs9uzcoWusHXUwiJkv9wKiUQSYSQM2WLzE3kUKgnaeMHMWu89s5WKdEvcbRCGT7jLEG19FEtcIUTIEAS93z0vwcotZZYJLZou66hQymWFBtPg-ZW_OqGOyn0ebAju2wE_kPWyWW_SLJmIoKKXozcNPg40XHOIGCNX9OTIMnY0sMX2dU0ArZ7PjHIIypv-pPLKMzawftVnEZeOV1t.a-A4TodjuK_QFZsJPQyL_rOx5ONsZPaiZvWlhh_yROY&dib_tag=se&keywords=red+foam+built+up+handles&qid=1742326681&sprefix=red+foam+built+up+%2Caps%2C99&sr=8-7','One 6 Pack',6,'L-3-R'),
 (2,'Dressing Sticks','',4,'','3',8,'L-3-L'),
 										# ID/Name/Desc/Threshold/ReodrLk/BuyQty/Cnt/Loc
 #OUT OF STOCK, 2 LINKS
-(3,'Reachers','',4,'https://www.alimed.com/alimed-economy-reacher.html($16.75 each) 
-https://www.amazon.com/Sammons-Preston-Standard-Lightweight-Aluminum/dp/B0C4RVYM35/ref=asc_df_B0C4RH52MB/?tag=hyprod-20&linkCode=df0&hvadid=680520178742&hvpos=&hvnetw=g&hvrand=5584270446649046665&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9024591&hvtargid=pla-2288320768244&mcid=7697445d31d43be7ba343bee2a2a68ec&gad_source=1&th=1(3 pack for $34)','3',
+(3,'Reachers','',4,'https://www.alimed.com/alimed-economy-reacher.html','3',
 0,'L-3-L'),
 #OUT OF STOCK
-(4,'Universal Cuff','Large/X-Large',3,'https://www.amazon.com/Sammons-Preston-Neuropathy-Universal-Assistance/dp/B06XQ3P671/ref=sr_1_7?crid=1N415JZUO6L5V&dib=eyJ2IjoiMSJ9.is6H3ItxkrciA0Nbc1EwF7dmJD-r1HIaOQkXjzckDHkEBRrTp_9PWW40KbLgBucCSpNtgWJpcw90u1FwTJ8Rv6-y7BaRjUjn_w4POC5QXSbHNj0YyCWIOwY2TRkiY1GjV365hPUTSPmOZpQyNuJzaS2r1BPX_qa-yywyFLpahNMLQeicAG_2CXaNpJatY4aAQIJ_RoVAEVxwRa1dVGZDEiKDvR0plgqSQiczeu7SDl1GMie2S_YZ-A6uGpFVOogkpYgeDhq5z4nDOlErcWk4K16wnG5483_8yw04MAUUXFA.wnlvIknWFPQEdYpQgcpjhX5iEtOik78Y_NHuylvCcxY&dib_tag=se&keywords=universal+cuff&qid=1732131110&sprefix=univeral+cuf%2Caps%2C128&sr=8-7($12.00 each)','3',
+(4,'Universal Cuff','Large/X-Large',3,'https://www.amazon.com/Sammons-Preston-Neuropathy-Universal-Assistance/dp/B06XQ3P671/ref=sr_1_7?crid=1N415JZUO6L5V&dib=eyJ2IjoiMSJ9.is6H3ItxkrciA0Nbc1EwF7dmJD-r1HIaOQkXjzckDHkEBRrTp_9PWW40KbLgBucCSpNtgWJpcw90u1FwTJ8Rv6-y7BaRjUjn_w4POC5QXSbHNj0YyCWIOwY2TRkiY1GjV365hPUTSPmOZpQyNuJzaS2r1BPX_qa-yywyFLpahNMLQeicAG_2CXaNpJatY4aAQIJ_RoVAEVxwRa1dVGZDEiKDvR0plgqSQiczeu7SDl1GMie2S_YZ-A6uGpFVOogkpYgeDhq5z4nDOlErcWk4K16wnG5483_8yw04MAUUXFA.wnlvIknWFPQEdYpQgcpjhX5iEtOik78Y_NHuylvCcxY&dib_tag=se&keywords=universal+cuff&qid=1732131110&sprefix=univeral+cuf%2Caps%2C128&sr=8-7','3',
 0,'L-2-D-R'),
 #OUT OF STOCK, NO LINK
 (5,'Sock Aide','',4,'','2',
 0,'L-4-R'),
 #LOW STOCK
-(6,'Shoe Funnels','',4,'https://www.amazon.com/Funnel-ergonomic-dressing-adjustable-post-surgery/dp/B075DH131H/ref=sr_1_5?crid=35A65QR7XYOCB&dib=eyJ2IjoiMSJ9.NSWYVSuP73Qmbi7fqZok7jZazMezEhfrRu8owsJdwy4mFQQbJnh0LjSLwCUTEbKsJWjcH_CGSwOrXUpA9O3WUD7dF4nWAwbHsUD3r5PDMK_d6IS1h0auKnipD04unuSQQg7k9ZDFs6caZeMaUPA7wrEwhyt-6VZjSbpa-gRemm-QTv77VQZJSZD5kK3BspsRpfYJfXtJpvSKgWzNOWcAP4J5ohPo8YgMUETjjYMOpAx3NoRVe-IHoNSMPD1kV6FlnXpvNNelcyDEP6Dw3bVsRPYlhmyQAhHKhpVc5bvFYOM.utCMRruDzfMz0iLZi4lwNzymlQYgdVAaV5GwE_dkSbo&dib_tag=se&keywords=shoe+funnel&qid=1732131134&sprefix=shoe+funnel%2Caps%2C125&sr=8-5($16.95 each )',
+(6,'Shoe Funnels','',4,'https://www.amazon.com/Funnel-ergonomic-dressing-adjustable-post-surgery/dp/B075DH131H/ref=sr_1_5?crid=35A65QR7XYOCB&dib=eyJ2IjoiMSJ9.NSWYVSuP73Qmbi7fqZok7jZazMezEhfrRu8owsJdwy4mFQQbJnh0LjSLwCUTEbKsJWjcH_CGSwOrXUpA9O3WUD7dF4nWAwbHsUD3r5PDMK_d6IS1h0auKnipD04unuSQQg7k9ZDFs6caZeMaUPA7wrEwhyt-6VZjSbpa-gRemm-QTv77VQZJSZD5kK3BspsRpfYJfXtJpvSKgWzNOWcAP4J5ohPo8YgMUETjjYMOpAx3NoRVe-IHoNSMPD1kV6FlnXpvNNelcyDEP6Dw3bVsRPYlhmyQAhHKhpVc5bvFYOM.utCMRruDzfMz0iLZi4lwNzymlQYgdVAaV5GwE_dkSbo&dib_tag=se&keywords=shoe+funnel&qid=1732131134&sprefix=shoe+funnel%2Caps%2C125&sr=8-5',
 '3', 2,'L-3-R'),
 #LOW STOCK, NO LINK
 (7,'Elastic Shoe Laces','',3,'',
