@@ -138,7 +138,7 @@ const InventoryApp = () => {
     if (!response.ok) throw new Error("Failed to generate PDF");
 
     const blob = await response.blob();
-    const url = window.URL.createObjectURL(new Blob([blob]));
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", "InventorySummary.pdf");
