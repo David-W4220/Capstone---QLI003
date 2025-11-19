@@ -67,12 +67,13 @@ public class EmailService
             }
             catch (Exception ex)
             {
+                //log error message to console
                 Console.WriteLine($"[Mailing Error！] {ex.GetType().Name}: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                return false;
+                Console.WriteLine(ex.StackTrace);                
+                //throw for controller to catch
+                throw new InvalidOperationException($"Email sending failed. Error: {ex.Message}", ex);
             }
         }
-
         private byte[] GeneratePdf(List<Audit_Log> audits, List<Transaction_Log> transactions)
         {
             using var stream = new MemoryStream();
