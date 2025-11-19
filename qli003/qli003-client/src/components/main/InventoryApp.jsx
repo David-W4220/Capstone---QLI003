@@ -128,11 +128,28 @@ const InventoryApp = () => {
   }
 
   // Handle export report
-  const handleExportReport = () => {
-    // TODO: Implement export logic
+  const handleExportReport = async () => {
     console.log("Exporting report...")
-    alert("Export functionality coming soon!")
-  }
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/report/export-summary`, {
+      method: "GET",
+    });
+
+    if (!response.ok) throw new Error("Failed to generate PDF");
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "InventorySummary.pdf");
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error exporting report:", error);
+      alert("Failed to export report. See console for details.");
+    }
+  };
 
   // Handle inline table actions
   const handleCheckout = (item) => {
