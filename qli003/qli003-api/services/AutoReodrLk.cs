@@ -13,7 +13,7 @@ public class AutoReodrLk : BackgroundService
     private readonly IConfiguration _config;
     private readonly IHubContext<QLIHub> _hubContext;
     //private readonly TimeSpan _interval = TimeSpan.FromDays(7);// <- EDIT RESENT INTERVAL BY DAYS HERE
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(20); // test interval: FromSeconds(30)
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(45); // test interval: FromSeconds(30)
 
     //public AutoReodrLk(QLIDbContext context, IConfiguration config)
     public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config, IHubContext<QLIHub> hubContext)
