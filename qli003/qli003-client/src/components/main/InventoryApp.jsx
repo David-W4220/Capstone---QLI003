@@ -27,6 +27,9 @@ import useSignalR from "../hooks/useSignalR"
 import useLowStockCount from "../hooks/useLowStockCount"
 import useEquipmentFilter from "../hooks/useEquipmentFilter"
 
+import useAutoReodr from "../hooks/useAutoReodr"//for AutoReorder's UI Feedback
+
+
 const API_BASE_URL = "http://localhost:5097" // Change the API_Base_URL to your hosts IP.
 // IE: from localhost to 192.168.X.X or the like
 const HUB_URL = `${API_BASE_URL}/qliHub`
@@ -67,6 +70,7 @@ const InventoryApp = () => {
   // Custom hooks
   const { equipment, loading, error, fetchEquipment } = useEquipmentData(API_URL)
   const { reportStatus, handleGenerateReport } = useReportGeneration(REPORT_API_URL)
+  const { autoStatus } = useAutoReodr()//for AutoReorder's UI Feedback
   const lowStockCount = useLowStockCount(equipment)
   const {
     searchTerm,
@@ -127,7 +131,7 @@ const InventoryApp = () => {
     setAddModalOpen(true)
   }
 
-  // Handle export report
+  // Handle export report console.log("Exporting report...")
   const handleExportReport = async () => {
     console.log("Exporting report...")
     try {
@@ -150,6 +154,7 @@ const InventoryApp = () => {
       alert("Failed to export report. See console for details.");
     }
   };
+
 
   // Handle inline table actions
   const handleCheckout = (item) => {
@@ -275,7 +280,14 @@ const InventoryApp = () => {
         <AppHeader 
           currentUser={currentUser}
           onLogout={handleLogout}
-        />
+        />    
+
+        {/*for AutoReorder's UI Feedback */}
+        {autoStatus && (<div className={
+          autoStatus.type === "success" ? "bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-4" :
+          autoStatus.type === "error" ? "bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4" :""}>
+        {autoStatus.message}
+        </div>)}
 
         {/* Low Stock Alert - Only show for Equipment table */}
         {selectedTable === 'Equipment' && (
