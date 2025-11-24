@@ -24,6 +24,10 @@ const useSignalR = (hubUrl, onRefresh) => {
       onRefresh()
     })
 
+    //for AutoReorder's UI Feedback
+    connection.on("AutoReorderStatus", (status) => {window.dispatchEvent(new CustomEvent("auto-reorder-status", { detail: status }));});
+
+
     try {
       await connection.start()
       console.log("SignalR Connected successfully.")
@@ -51,5 +55,6 @@ const useSignalR = (hubUrl, onRefresh) => {
     }
   }, [startSignalRConnection])
 }
+
 
 export default useSignalR
