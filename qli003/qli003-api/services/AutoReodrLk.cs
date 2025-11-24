@@ -1,6 +1,7 @@
 using MailKit.Net.Smtp;
 using MimeKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
 
 public class AutoReodrLk : BackgroundService
 {
@@ -10,16 +11,18 @@ public class AutoReodrLk : BackgroundService
     //private readonly QLIDbContext _context;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _config;
-    private readonly TimeSpan _interval = TimeSpan.FromDays(7);// <- EDIT RESENT INTERVAL BY DAYS HERE
-    //private readonly TimeSpan _interval = TimeSpan.FromSeconds(30); // test interval: FromSeconds(30)
+    private readonly IHubContext<QLIHub> _hubContext;
+    //private readonly TimeSpan _interval = TimeSpan.FromDays(7);// <- EDIT RESENT INTERVAL BY DAYS HERE
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(20); // test interval: FromSeconds(30)
 
     //public AutoReodrLk(QLIDbContext context, IConfiguration config)
-    public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config)
+    public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config, IHubContext<QLIHub> hubContext)
     {
         //<AddScoped Setting>
         //_context = context;
         _scopeFactory = scopeFactory; // Store the factory
         _config = config;
+        _hubContext = hubContext;
     }
 
     //backend looping entry
@@ -62,6 +65,9 @@ public class AutoReodrLk : BackgroundService
         if (lowList.Count == 0)
         {
             Console.WriteLine("[AutoReodrLk] Scan complete. No items are below threshold. No email sent.");
+            
+            await _hubContext.Clients.All.SendAsync("AutoReorderStatus", new { type = "success", message = "Auto scan complete. No items are below threshold. No email sent." });
+
             return false;
         }
 
@@ -112,12 +118,17 @@ public class AutoReodrLk : BackgroundService
             await client.DisconnectAsync(true);
 
             Console.WriteLine("[AutoReodrLk] Reorder email sent successfully.");
+            
+            //for AutoReorder's UI Feedback
+            await _hubContext.Clients.All.SendAsync("AutoReorderStatus", new { type = "success", message = "Auto reorder email sent successfully." });            
             return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[Mailing Error！] {ex.GetType().Name}: {ex.Message}");
             Console.WriteLine(ex.StackTrace);
+
+            await _hubContext.Clients.All.SendAsync("AutoReorderStatus",new { type = "error", message = $"Auto reorder mailing failed! ERROR: {ex.Message}" });
             throw new InvalidOperationException($"Email sending failed. Error: {ex.Message}", ex);
         }
     }
