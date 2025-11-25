@@ -133,3 +133,6 @@ Merge austin's three new modal components with Tailwind CSS (no external depende
 - No external modal libraries required (removed react-modal dependency)
 - Real-time updates via SignalR still functional
 - Transaction logs properly track equipment sign-outs with foreign key constraints
+
+## Release Notes 11/24/2025
+Basically everything as mentioned before. Exporting inventory report button works, along with a major update in the frontend on how the app functions.
