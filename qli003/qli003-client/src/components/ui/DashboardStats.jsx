@@ -7,7 +7,7 @@ const DashboardStats = ({ equipment, lowStockCount }) => {
   return (
     <div className="grid gap-4 md:grid-cols-3 mb-6">
         {/* Total Items Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-gray-300 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-gray-900" data-testid="total-equipment">
@@ -24,7 +24,7 @@ const DashboardStats = ({ equipment, lowStockCount }) => {
         </div>
 
         {/* Low Stock Alerts Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-gray-300 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div 
@@ -44,7 +44,7 @@ const DashboardStats = ({ equipment, lowStockCount }) => {
         </div>
 
         {/* Total Quantity Card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-gray-300 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-gray-900">
