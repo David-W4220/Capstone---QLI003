@@ -275,13 +275,13 @@ const InventoryApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* App Header with Logo and User Info */}
-        <AppHeader 
-          currentUser={currentUser}
-          onLogout={handleLogout}
-        />    
+      {/* App Header with Logo and User Info - Full width sticky header */}
+      <AppHeader 
+        currentUser={currentUser}
+        onLogout={handleLogout}
+      />
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/*for AutoReorder's UI Feedback */}
         {autoStatus && (<div className={
           autoStatus.type === "success" ? "bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-4" :

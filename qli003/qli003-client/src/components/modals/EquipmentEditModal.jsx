@@ -235,7 +235,7 @@ const EquipmentEditModal = ({ isOpen, onClose, equipment, onSave }) => {
               <button
                 type="submit"
                 disabled={status.includes('Updating')}
-                className="flex-1 py-2.5 px-4 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors btn-scale"
+                className="flex-1 py-2.5 px-4 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors btn-scale"
               >
                 {status.includes('Updating') ? 'Updating...' : 'Save Changes'}
               </button>

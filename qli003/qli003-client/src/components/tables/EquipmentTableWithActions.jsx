@@ -30,7 +30,7 @@ const EquipmentTableWithActions = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-300">
       <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
@@ -87,7 +87,7 @@ const EquipmentTableWithActions = ({
                       e.stopPropagation()
                       onCheckout(item)
                     }}
-                    className="px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors btn-scale"
+                    className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition-colors btn-scale"
                   >
                     Check Out
                   </button>
@@ -105,7 +105,7 @@ const EquipmentTableWithActions = ({
                       e.stopPropagation()
                       onEdit(item)
                     }}
-                    className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors btn-scale"
+                    className="px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 transition-colors btn-scale"
                   >
                     Edit
                   </button>

@@ -149,7 +149,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
 
                         {/* User Name Field */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Your Name <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 value={userName}
@@ -164,7 +164,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
 
                         {/* Quantity Field */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity <span className="text-red-500">*</span></label>
                             <input
                                 type="number"
                                 value={quantity}
@@ -207,7 +207,7 @@ const EquipmentCheckInModal = ({ selectedEquipment, isOpen, onClose, onCheckIn, 
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 py-2.5 px-4 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors btn-scale"
+                                className="flex-1 py-2.5 px-4 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors btn-scale"
                                 disabled={!userName.trim() || status === 'Processing...'}
                             >
                                 {status === 'Processing...' ? 'Processing...' : 'Check In'}

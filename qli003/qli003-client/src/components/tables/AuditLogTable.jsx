@@ -130,7 +130,7 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-300">
         <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0 z-10">
