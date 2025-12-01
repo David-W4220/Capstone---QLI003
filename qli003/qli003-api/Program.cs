@@ -47,7 +47,7 @@ builder.Services.AddHostedService<AutoReodrLk>();
 
 
 //Tells the application to listen to all IPs on this port
-builder.WebHost.UseUrls("http://0.0.0.0:5097");
+//builder.WebHost.UseUrls("http://0.0.0.0:5097");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

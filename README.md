@@ -47,6 +47,7 @@ dotnet add package QuestPDF
 ```
 
 - Install Papercut SMTP to view the mail and PDF attatchment
+- dotnet dev-certs https --trust - This allows your localhost or whatever you are using to do HTTPS
 
 - Register new mail service in Program.cs by adding this line 
 `builder.Services.AddScoped<qli003_api.Services.EmailService>();`<br>   
