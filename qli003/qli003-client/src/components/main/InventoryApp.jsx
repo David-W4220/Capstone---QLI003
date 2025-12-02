@@ -28,7 +28,7 @@ import useLowStockCount from "../hooks/useLowStockCount"
 import useEquipmentFilter from "../hooks/useEquipmentFilter"
 
 import useAutoReodr from "../hooks/useAutoReodr"//for AutoReorder's UI Feedback
-
+import AutoReodrRect from "../ui/AutoReodrRect"//NEW rectangle to set reorder mailing interval
 
 const API_BASE_URL = "http://localhost:5097" // Change the API_Base_URL to your hosts IP.
 // IE: from localhost to 192.168.X.X or the like
@@ -311,6 +311,13 @@ const InventoryApp = () => {
           <DashboardStats
             equipment={equipment}
             lowStockCount={lowStockCount}
+          />
+        )}
+
+        {/* NEW rectangle to set reorder mailing interval */}
+        {selectedTable === 'Equipment' && (
+          <AutoReodrRect
+          API_BASE_URL={API_BASE_URL}
           />
         )}
 
