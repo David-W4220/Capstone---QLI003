@@ -13,16 +13,19 @@ public class AutoReodrLk : BackgroundService
     private readonly IConfiguration _config;
     private readonly IHubContext<QLIHub> _hubContext;
     //private readonly TimeSpan _interval = TimeSpan.FromDays(7);// <- EDIT RESENT INTERVAL BY DAYS HERE
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(45); // test interval: FromSeconds(30)
+        //private readonly TimeSpan _interval = TimeSpan.FromSeconds(20); // test interval: FromSeconds(30)
+    private readonly AutoReodrSetting _setDays;
 
     //public AutoReodrLk(QLIDbContext context, IConfiguration config)
-    public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config, IHubContext<QLIHub> hubContext)
+    public AutoReodrLk(IServiceScopeFactory scopeFactory, IConfiguration config, IHubContext<QLIHub> hubContext,
+    AutoReodrSetting setDays)
     {
         //<AddScoped Setting>
         //_context = context;
         _scopeFactory = scopeFactory; // Store the factory
         _config = config;
         _hubContext = hubContext;
+        _setDays = setDays;
     }
 
     //backend looping entry
@@ -40,7 +43,8 @@ public class AutoReodrLk : BackgroundService
             }
 
             // Sleep 7 days
-            await Task.Delay(_interval, stoppingToken);
+            //await Task.Delay(_interval, stoppingToken);
+            await Task.Delay(TimeSpan.FromDays(_setDays.intervalDays), stoppingToken);
         }
     }
 
