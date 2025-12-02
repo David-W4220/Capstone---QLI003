@@ -34,26 +34,26 @@ Basically once you start the .NET and then go to the API and start that it opens
 
 # Mailing Feature(Finalized 12/2/2025)
 The mailing feature includes
-1. Function to create a "Inventory summary report" that includes formatted contents of transaction log and audit log datum with timestamps and send it to a designated mailing address. This is manually triggered by a `generate history report` button through React UI or by Swagger endpoint testing.
+1. Functionality to create a "Inventory summary report" that includes formatted contents of transaction log and audit log datum with timestamps and send it to a designated mailing address. This is manually triggered by a `generate history report` button through React UI or by Swagger endpoint testing.
    
-2. Function to scan for low/out of stock items recursively by a frontend configurable time interval(default is 7 days), formats a list of them(if any) with corresponding suggested repurchasing quantities and links(and indicate in the mail if its unavaliable yet), into a HTML table. Then, send it to a designated mailing address. This is a fully automatic backend feature(its relevant status/error messages will still show up in React UI as feedback). It starts automatically when the server starts. 
+2. Functionnaliy to scan for low/out of stock items recursively by a frontend configurable time interval(default is 7 days), formats a list of them(if any) with corresponding suggested repurchasing quantities and links(and indicate in the mail if its unavaliable yet), into a HTML table. Then, send it to a designated mailing address. This is a fully automatic backend feature(its relevant status/error messages will still show up in React UI as feedback). It starts automatically when the server starts. 
 
 ## Modified/newly added files
 qli003-api:
-services/
-- AutoReodrLk.cs
-- HistoryPDF.cs
-controllers/
-- ReportController.cs
-- AutoReodrSetting.cs
+- services/
+  - AutoReodrLk.cs
+  - HistoryPDF.cs
+- controllers/
+  - ReportController.cs
+  - AutoReodrSetting.cs
   
 qli003-client:
 - inventoryApp.jsx
-src/components/hooks/
-- useAutoReodr.js
-- useSignalR.js
-src/components/ui/
-- AutoReodrRect.jsx
+- src/components/hooks/
+  - useAutoReodr.js
+  - useSignalR.js
+- src/components/ui/
+  - AutoReodrRect.jsx
   
 ## Requirements
 - Packages
@@ -74,7 +74,6 @@ builder.Services.AddScoped<HistoryPDF>();
 //builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
 builder.Services.AddHostedService<AutoReodrLk>();
 builder.Services.AddSingleton<AutoReodrSetting>();
-
 ```
 <br>Before<br>  
 `builder.WebHost.UseUrls("http://0.0.0.0:5097");`
