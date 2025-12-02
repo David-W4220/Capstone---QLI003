@@ -32,25 +32,51 @@ Basically once you start the .NET and then go to the API and start that it opens
 
 ---------
 
-# Mailing Feature
+# Mailing Feature(Finalized 12/2/2025)
+The mailing feature includes
+1. Function to create a "Inventory summary report" that includes formatted contents of transaction log and audit log datum with timestamps and send it to a designated mailing address. This is manually triggered by a `generate history report` button through React UI or by Swagger endpoint testing.
+   
+2. Function to scan for low/out of stock items recursively by a frontend configurable time interval(default is 7 days), formats a list of them(if any) with corresponding suggested repurchasing quantities and links(and indicate in the mail if its unavaliable yet), into a HTML table. Then, send it to a designated mailing address. This is a fully automatic backend feature(its relevant status/error messages will still show up in React UI as feedback). It starts automatically when the server starts. 
 
-## New files added
-- ReportController.cs (under controllers/)
-- services/EmailService.cs
-
+## Modified/newly added files
+qli003-api:
+services/
+- AutoReodrLk.cs
+- HistoryPDF.cs
+controllers/
+- ReportController.cs
+- AutoReodrSetting.cs
+  
+qli003-client:
+- inventoryApp.jsx
+src/components/hooks/
+- useAutoReodr.js
+- useSignalR.js
+src/components/ui/
+- AutoReodrRect.jsx
+  
 ## Requirements
 - Packages
 ```
 cd qli003-api
 dotnet add package MailKit
 dotnet add package QuestPDF
+
+cd..; cd ali003
+npm install axios 
 ```
 
-- Install Papercut SMTP to view the mail and PDF attatchment
+- Install test mailing server `Papercut SMTP` to view the mail contents and PDF attatchment.
 
-- Register new mail service in Program.cs by adding this line 
-`builder.Services.AddScoped<qli003_api.Services.EmailService>();`<br>   
-Before<br>  
+- Register the two mail services in `Program.cs` by adding these lines
+```
+builder.Services.AddScoped<HistoryPDF>();
+//builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
+builder.Services.AddHostedService<AutoReodrLk>();
+builder.Services.AddSingleton<AutoReodrSetting>();
+
+```
+<br>Before<br>  
 `builder.WebHost.UseUrls("http://0.0.0.0:5097");`
 
 - Configure SMTP in appsettings.json
@@ -63,12 +89,15 @@ Before<br>
 }
 ```
 
-## How to run(without using frontend):
-1. Do `dotnet run`, open [Swagger UI](http://localhost:5097/swagger/index.html), find Report's POST /api/Report/send, click "Try it out" and then "Execute". You should see a `{ "message": "Report sent successfully."}` in the Response body beneath.
-2. Go to Papercut SMTP UI, the plain text message should be viewable under "message" while "Headers" should contain other mail info. As for the pdf report, right click, save as to view it locally if you cant open it directly under "Sections" 
-
 ## Notes
-In future this should link to frontend react which should add a button to generate such mail instead of swagger.(Already Achieved)
+1. To test Without using frontend, Do `dotnet run`, then open [Swagger UI](http://localhost:5097/swagger/index.html), several `POST` and `GET` method under corresponding endpoint catagories `AutoReodrSetting`, `AutoReorder` and `Report`. These are where to click "Try it out" and then "Execute". You should see the results in the Response body beneath.
+
+2. React UI included status/error messages to indicate if things are going correctly, or why its not. To view the actual content will require Papercut SMTP server opened. If sended successfully, go to its UI, plain text messages should be viewable under "message" while "Headers" should contain other mail info. As for the pdf report, right click, save as to view it locally if you cant open it directly under "Sections".
+
+3. Resetting the time interval of reorder link mails in React does take effect immediately, but it resets to the default value if the server restarts.
+      
+4. The `export report` button in React UI is not a part of mailing feature, but also included in this catagory. Upon clicking, it downloads a comprehensive PDF report of audit logs and transaction logs and a list of low/out of stock items(or indicate that no items' are below threshold currently) to local.
+
 
 ---------
 
