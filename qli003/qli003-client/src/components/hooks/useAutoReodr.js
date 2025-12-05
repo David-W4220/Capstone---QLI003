@@ -19,7 +19,7 @@ export default function useAutoReodr() {
   useEffect(() => {
     if (!autoStatus) return
 
-    const timer = setTimeout(() => {setAutoStatus(null)}, 10000) // <- adjust timer here(currently 10 sec)
+    const timer = setTimeout(() => {setAutoStatus(null)}, 5000) // <- adjust timer here(currently 5 sec)
 
     return () => clearTimeout(timer)}, [autoStatus])
 

@@ -31,6 +31,9 @@ import useEquipmentFilter from "../hooks/useEquipmentFilter"
 import useAutoReodr from "../hooks/useAutoReodr" //for AutoReorder's UI Feedback
 
 const API_BASE_URL = "https://localhost:7058" // Change the API_Base_URL to your hosts IP.
+import useAutoReodr from "../hooks/useAutoReodr"//for AutoReorder's UI Feedback
+import AutoReodrRect from "../ui/AutoReodrRect"//NEW rectangle to set reorder mailing interval
+// IE: from localhost to 192.168.X.X or the like
 const HUB_URL = `${API_BASE_URL}/qliHub`
 const LOGIN_API_URL = `${API_BASE_URL}/api/Admins/login` // NEW: Login API URL
 const TABLE_CONTROLLERS = {
@@ -384,6 +387,14 @@ const InventoryApp = () => {
         )}
 
         {/* Action Buttons Bar (Admin Only for Add/Export/Report) */}
+        {/* NEW rectangle to set reorder mailing interval */}
+        {selectedTable === 'Equipment' && (
+          <AutoReodrRect
+          API_BASE_URL={API_BASE_URL}
+          />
+        )}
+
+        {/* Action Buttons Bar - Only show for Equipment table */}
         {selectedTable === 'Equipment' && (
           <ActionButtonsBar
             onAddEquipment={handleAddEquipment} // Pass the handler directly

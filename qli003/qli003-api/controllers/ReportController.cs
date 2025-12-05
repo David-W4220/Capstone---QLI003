@@ -31,7 +31,7 @@ using QuestPDF.Infrastructure;
                 return StatusCode(500, new { message = ex.Message });
             }
         }
-        //Export Report PDF
+        //Export Report PDF(Button)
         [HttpGet("export-summary")]
         public async Task<IActionResult> ExportSummaryReport()
         {
@@ -186,7 +186,7 @@ using QuestPDF.Infrastructure;
             _autoReodrLk = autoReodrLk;
         }
 
-        //Auto reorder reprt
+        //Auto reorder report
         //NOTE: MANUAL TEST CAN ONLY BE USED IN ADDSCOPED SETTING! Need change AutoReordLk according to ReoderManually
         [HttpPost("manual-lowstock-scan")]
         public async Task<IActionResult> SendLowStock()
@@ -201,5 +201,32 @@ using QuestPDF.Infrastructure;
             {
                 return StatusCode(500, new { message = ex.Message });
             }
+        }
+    }
+
+//reset reorder link mailing's resending time interval
+[ApiController]
+    [Route("api/[controller]")]
+    public class AutoReodrSettingController : ControllerBase
+    {
+        private readonly AutoReodrSetting _setDays;
+
+        public AutoReodrSettingController(AutoReodrSetting setDays)
+        {
+            _setDays = setDays;
+        }
+
+        [HttpPost("set-interval")]
+        public IActionResult SetInterval([FromBody] int days)
+        {
+            if (days < 1) return BadRequest(new {message = $"ERROR: Resend interval must be an integer thats greater than 0!"});
+            _setDays.intervalDays = days;
+            return Ok(new {message = $"Resend interval's successfully reset to {days} day(s)!"});
+        }
+
+        [HttpGet("get-interval")]
+        public IActionResult GetInterval()
+        {
+            return Ok(new {intervalDays = _setDays.intervalDays});
         }
     }

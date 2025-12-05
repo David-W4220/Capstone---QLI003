@@ -44,6 +44,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<HistoryPDF>();
 //builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
 builder.Services.AddHostedService<AutoReodrLk>();
+builder.Services.AddSingleton<AutoReodrSetting>();
 
 
 //Tells the application to listen to all IPs on this port
