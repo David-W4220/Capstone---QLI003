@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import AppHeader from "../layout/AppHeader"
 import Header from "../layout/Header"
 import LowStockAlert from "../ui/LowStockAlert"
@@ -21,21 +21,20 @@ import AuditLogTable from "../tables/AuditLogTable"
 import AuditLogDetailsModal from "../modals/AuditLogDetailsModal"
 import TransactionLogTable from "../tables/TransactionLogTable"
 import TransactionLogDetailsModal from "../modals/TransactionLogDetailsModal"
+import LoginModal from "../modals/LoginModal" 
 import useEquipmentData from "../hooks/useEquipmentData"
 import useReportGeneration from "../hooks/useReportGeneration"
 import useSignalR from "../hooks/useSignalR"
 import useLowStockCount from "../hooks/useLowStockCount"
 import useEquipmentFilter from "../hooks/useEquipmentFilter"
+import AutoReodrRect from "../ui/AutoReordrRect"
+import useAutoReodr from "../hooks/useAutoReodr" 
 
-import useAutoReodr from "../hooks/useAutoReodr"//for AutoReorder's UI Feedback
-import AutoReodrRect from "../ui/AutoReodrRect"//NEW rectangle to set reorder mailing interval
-
-const API_BASE_URL = "http://localhost:5097" // Change the API_Base_URL to your hosts IP.
-// IE: from localhost to 192.168.X.X or the like
+const API_BASE_URL = "https://localhost:7058" // Using the secure port 7058
 const HUB_URL = `${API_BASE_URL}/qliHub`
+const LOGIN_API_URL = `${API_BASE_URL}/api/Admins/login` 
 const TABLE_CONTROLLERS = {
   Equipment: "Equipment",
-  Admins: "Admins",
   "Audit Log": "Auditlog",
   "Transaction Log": "Transactionlog",
 }
@@ -45,9 +44,12 @@ const TABLE_CONTROLLERS = {
  * Manages state, data fetching, and SignalR connection.
  */
 const InventoryApp = () => {
-  // User authentication state
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-  const [currentUser, setCurrentUser] = useState("Admin User")
+  // --- AUTHENTICATION STATE ---
+  const [isLoggedIn, setIsLoggedIn] = useState(false) 
+  const [currentUser, setCurrentUser] = useState(null) 
+  const [userRole, setUserRole] = useState("Public") 
+  const [showLoginModal, setShowLoginModal] = useState(false) 
+  const [adminId, setAdminId] = useState(null); 
 
   // State for which table is currently selected
   const [selectedTable, setSelectedTable] = useState("Equipment")
@@ -70,7 +72,7 @@ const InventoryApp = () => {
   // Custom hooks
   const { equipment, loading, error, fetchEquipment } = useEquipmentData(API_URL)
   const { reportStatus, handleGenerateReport } = useReportGeneration(REPORT_API_URL)
-  const { autoStatus } = useAutoReodr()//for AutoReorder's UI Feedback
+  const { autoStatus } = useAutoReodr() 
   const lowStockCount = useLowStockCount(equipment)
   const {
     searchTerm,
@@ -79,7 +81,7 @@ const InventoryApp = () => {
     setFilterStatus,
     filterLocation,
     setFilterLocation,
-    filteredEquipment
+    filteredEquipment,
   } = useEquipmentFilter(equipment)
 
   // Fetch equipment when component mounts or API_URL changes
@@ -89,6 +91,38 @@ const InventoryApp = () => {
 
   // SignalR real-time updates
   useSignalR(HUB_URL, fetchEquipment)
+
+  // --- Handle Admin Login (API Integration) ---
+  const handleLogin = async (username, password) => {
+    try {
+      const response = await fetch(LOGIN_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Username: username, Password: password }),
+      })
+
+      if (response.ok) {
+        const adminData = await response.json()
+        
+        setAdminId(adminData.Id);
+        setCurrentUser(adminData.Username)
+        setUserRole('Admin')
+        setIsLoggedIn(true)
+        setShowLoginModal(false)
+        console.log(`Admin ${adminData.Username} logged in successfully.`)
+        return true 
+      } else {
+        const errorText = await response.text()
+        console.error("Login failed:", errorText)
+        alert("Login failed: Invalid username or password.")
+        return false 
+      }
+    } catch (error) {
+      console.error("Network error during login:", error)
+      alert("A network error occurred. Please check the API status.")
+      return false 
+    }
+  }
 
   // Handle table row click
   const handleRowClick = (item) => {
@@ -111,18 +145,25 @@ const InventoryApp = () => {
 
   // Handle table selection change
   const handleTableChange = (table) => {
-    setSelectedTable(table)
+    if (userRole === 'Admin') {
+      setSelectedTable(table)
+    } else {
+        setSelectedTable('Equipment')
+    }
   }
 
   // Handle logout
   const handleLogout = () => {
     setIsLoggedIn(false)
-    // Add logout logic here (clear tokens, redirect, etc.)
+    setCurrentUser(null)
+    setUserRole("Public")
+    setAdminId(null); // Clear the Admin's ID on logout
+    setSelectedTable("Equipment") 
+    console.log("Admin logged out.")
   }
 
   // Handle view low stock items
   const handleViewLowStock = () => {
-    // Set filter to show only low stock items
     setFilterStatus("low")
   }
 
@@ -136,25 +177,24 @@ const InventoryApp = () => {
     console.log("Exporting report...")
     try {
       const response = await fetch(`${API_BASE_URL}/api/report/export-summary`, {
-      method: "GET",
-    });
+        method: "GET",
+      })
 
-    if (!response.ok) throw new Error("Failed to generate PDF");
+      if (!response.ok) throw new Error("Failed to generate PDF")
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "InventorySummary.pdf");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode.removeChild(link);
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.setAttribute("download", "InventorySummary.pdf")
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
     } catch (error) {
-      console.error("Error exporting report:", error);
-      alert("Failed to export report. See console for details.");
+      console.error("Error exporting report:", error)
+      alert("Failed to export report. See console for details.")
     }
-  };
-
+  }
 
   // Handle inline table actions
   const handleCheckout = (item) => {
@@ -168,16 +208,30 @@ const InventoryApp = () => {
   }
 
   const handleEdit = (item) => {
-    setSelectedEquipment(item)
-    setEditModalOpen(true)
+    if (userRole === 'Admin') {
+      setSelectedEquipment(item)
+      setEditModalOpen(true)
+    } else {
+        alert("Only Administrators can edit equipment.")
+    }
   }
 
   const handleDelete = (item) => {
-    setSelectedEquipment(item)
-    setDeleteModalOpen(true)
+    if (userRole === 'Admin') {
+      setSelectedEquipment(item)
+      setDeleteModalOpen(true)
+    } else {
+        alert("Only Administrators can delete equipment.")
+    }
   }
 
+  // --- UPDATED: Uses adminId for Audit Log ---
   const handleConfirmDelete = async (item) => {
+    if (!adminId) {
+        alert("Action requires an active Admin session.");
+        return;
+    }
+    
     try {
       const equipmentId = item.Equipment_Id || item.ID
       const response = await fetch(`${API_URL}/delete/${equipmentId}`, {
@@ -186,12 +240,12 @@ const InventoryApp = () => {
 
       if (response.ok) {
         console.log("Equipment deleted successfully")
-        
+
         // Create audit log entry for equipment deletion
         const auditLog = {
-          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Admin_ID: adminId, // CRITICAL FIX: Use stored Admin ID
           Act_Description: `Deleted equipment: ${item.Name} (ID: ${equipmentId})`,
-          Timestamp: new Date().toISOString()
+          Timestamp: new Date().toISOString(),
         }
 
         await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
@@ -213,10 +267,10 @@ const InventoryApp = () => {
     }
   }
 
-  // Handle edit submission
+  // --- UPDATED: Uses adminId for Audit Log ---
   const handleEditSubmit = async (formData) => {
-    if (!selectedEquipment) return
-    
+    if (!selectedEquipment || !adminId) return
+
     try {
       // Prepare full equipment object for API
       const updateData = {
@@ -227,7 +281,7 @@ const InventoryApp = () => {
         Alpha_Loc: formData.Location,
         Threshold: parseInt(formData.Threshold) || 0,
         ReodrLk_Pri_Qty: formData.ReorderLink,
-        BuyQty: selectedEquipment.BuyQty
+        BuyQty: selectedEquipment.BuyQty,
       }
 
       const response = await fetch(`${API_URL}/update/${updateData.ID}`, {
@@ -240,12 +294,12 @@ const InventoryApp = () => {
 
       if (response.ok) {
         console.log("Equipment updated successfully")
-        
+
         // Create audit log entry for equipment update
         const auditLog = {
-          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Admin_ID: adminId,
           Act_Description: `Updated equipment: ${updateData.Name} (ID: ${updateData.ID})`,
-          Timestamp: new Date().toISOString()
+          Timestamp: new Date().toISOString(),
         }
 
         await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
@@ -278,33 +332,54 @@ const InventoryApp = () => {
       {/* App Header with Logo and User Info - Full width sticky header */}
       <AppHeader 
         currentUser={currentUser}
+        userRole={userRole}
+        isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
+        onLoginClick={() => setShowLoginModal(true)}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/*for AutoReorder's UI Feedback */}
-        {autoStatus && (<div className={
-          autoStatus.type === "success" ? "bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-4" :
-          autoStatus.type === "error" ? "bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4" :""}>
-        {autoStatus.message}
-        </div>)}
+        {autoStatus && (
+          <div
+            className={
+              autoStatus.type === "success"
+                ? "bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-4"
+                : autoStatus.type === "error"
+                ? "bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4"
+                : ""
+            }
+          >
+            {autoStatus.message}
+          </div>
+        )}
+        
+        {/* NEW: Auto Reorder Interval Setting (Admin Only) */}
+        {selectedTable === 'Equipment' && userRole === 'Admin' && (
+            <AutoReodrRect API_BASE_URL={API_BASE_URL} />
+        )}
 
         {/* Low Stock Alert - Only show for Equipment table */}
-        {selectedTable === 'Equipment' && (
+        {selectedTable === 'Equipment' && userRole === 'Admin' && (
           <LowStockAlert
             lowStockCount={lowStockCount}
             onViewLowStock={handleViewLowStock}
           />
         )}
 
-        {/* Table Selection and Report Header */}
-        <Header
-          selectedTable={selectedTable}
-          onTableChange={handleTableChange}
-          onGenerateReport={handleGenerateReport}
-          reportStatus={reportStatus}
-          tableControllers={TABLE_CONTROLLERS}
-        />
+        {/* Table Selection and Report Header (Admin Only) */}
+        {userRole === 'Admin' ? (
+          <Header
+            selectedTable={selectedTable}
+            onTableChange={handleTableChange}
+            onGenerateReport={handleGenerateReport}
+            reportStatus={reportStatus}
+            tableControllers={TABLE_CONTROLLERS}
+          />
+        ) : (
+            // Public View Header when dropdown is hidden
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">Equipment Inventory</h1>
+        )}
 
         {/* Dashboard Stats Cards - Only show for Equipment table */}
         {selectedTable === 'Equipment' && (
@@ -314,20 +389,14 @@ const InventoryApp = () => {
           />
         )}
 
-        {/* NEW rectangle to set reorder mailing interval */}
-        {selectedTable === 'Equipment' && (
-          <AutoReodrRect
-          API_BASE_URL={API_BASE_URL}
-          />
-        )}
-
-        {/* Action Buttons Bar - Only show for Equipment table */}
+        {/* Action Buttons Bar (Admin Only for Add/Export/Report) */}
         {selectedTable === 'Equipment' && (
           <ActionButtonsBar
             onAddEquipment={handleAddEquipment}
             onExportReport={handleExportReport}
             onGenerateHistoryReport={handleGenerateReport}
             isGeneratingReport={reportStatus.includes("Generating")}
+            userRole={userRole} // Pass role to ActionButtonsBar for internal checks
           />
         )}
 
@@ -349,6 +418,7 @@ const InventoryApp = () => {
           <EquipmentTableWithActions
             equipment={filteredEquipment}
             loading={loading}
+            userRole={userRole} 
             onCheckout={handleCheckout}
             onCheckin={handleCheckin}
             onEdit={handleEdit}
@@ -449,6 +519,14 @@ const InventoryApp = () => {
             setSelectedTransactionLog(null)
           }}
         />
+
+        {/* Login Modal Inclusion */}
+        <LoginModal
+            isOpen={showLoginModal}
+            onClose={() => setShowLoginModal(false)}
+            onLogin={handleLogin}
+        />
+
       </div>
     </div>
   )

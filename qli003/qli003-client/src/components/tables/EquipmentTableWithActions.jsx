@@ -6,8 +6,13 @@ const EquipmentTableWithActions = ({
   onCheckin, 
   onEdit, 
   onDelete,
-  onRowClick
+  onRowClick,
+  userRole // <-- NEW: Accept the userRole prop
 }) => {
+  
+  // Determine if the current user has Admin privileges
+  const isAdmin = userRole === 'Admin'; // CRITICAL: Check the role
+
   const getStatusBadge = (item) => {
     const stock = item.Item_Cnt || 0
     const threshold = item.Threshold || 0
@@ -82,6 +87,7 @@ const EquipmentTableWithActions = ({
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex gap-2">
+                  {/* Check Out Button (Public/Staff Action - Always visible) */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
@@ -91,6 +97,8 @@ const EquipmentTableWithActions = ({
                   >
                     Check Out
                   </button>
+                  
+                  {/* Check In Button (Public/Staff Action - Always visible) */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
@@ -100,24 +108,30 @@ const EquipmentTableWithActions = ({
                   >
                     Check In
                   </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onEdit(item)
-                    }}
-                    className="px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 transition-colors btn-scale"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onDelete(item)
-                    }}
-                    className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors btn-scale"
-                  >
-                    Delete
-                  </button>
+                  
+                  {/* Edit and Delete Buttons (ADMIN ONLY) */}
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEdit(item)
+                        }}
+                        className="px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 transition-colors btn-scale"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onDelete(item)
+                        }}
+                        className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors btn-scale"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>
