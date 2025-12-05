@@ -1,6 +1,3 @@
-Leaving this in just for fun\
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 ## Packages and misc.
 npx create react app basis\
 dotnet new webapi basis\
@@ -16,7 +13,8 @@ Youll want the c# dev kit on vs code
 
 ### Prerequisites
 1. Update `qli003-api/appsettings.json` with your database connection string (server, database name, user, password)
-2. Update `qli003-client/src/` API URLs to match your .NET API host/port if not using default localhost:5097
+2. Update `qli003-api/Properties/appsettings.json` with whatever port you want the backend to run on
+3. Update `qli003-client/src/` API URLs to match your .NET API host/port if not using default
 
 ### Start the Application
 
@@ -39,7 +37,6 @@ start-app-windows.bat
    cd qli003-api
    dotnet run
    ```
-   The API will start on http://localhost:5097
 
 2. **Frontend (React)** (in a separate terminal)
    ```
@@ -47,7 +44,6 @@ start-app-windows.bat
    npm install    # First time only, or if dependencies changed
    npm start
    ```
-   The app will open at http://localhost:3000
 
 ### Running Tests
 

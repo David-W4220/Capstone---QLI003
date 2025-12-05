@@ -19,7 +19,9 @@ Had to include <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-sig
 ## Requirements
 Install node.js .net8.0 mysql community server and workbench: workbench is optional, I would watch a video on the server if you don't know about it but maybe thats just mac\
 You'll want the c# dev kit on vs code\
-May need to run npm install in the client console.
+Run npm install in the client console.
+dotnet dev-certs https --trust - This allows your localhost or whatever you are using to do HTTPS - main terminal not in application location
+npm install cross-env --save-dev - to do https
 
 ## How to Run
 Update database=schema to whatever you called it, user and password in appsetings.json in api\
@@ -62,12 +64,11 @@ cd qli003-api
 dotnet add package MailKit
 dotnet add package QuestPDF
 
-cd..; cd ali003
+cd..; cd qli003
 npm install axios 
 ```
 
 - Install Papercut SMTP to view the mail and PDF attatchment
-- dotnet dev-certs https --trust - This allows your localhost or whatever you are using to do HTTPS
 - Install test mailing server `Papercut SMTP` to view the mail contents and PDF attatchment.
 
 - Register the two mail services in `Program.cs` by adding these lines

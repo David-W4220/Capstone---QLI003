@@ -85,7 +85,7 @@ const AutoReodrRect = ({ API_BASE_URL }) => {
         className="flex items-center space-x-3 whitespace-nowrap overflow-hidden"
       >
         <span className="font-semibold text-gray-900">
-          MAIL THE REORDER SUGGESTION LIST BY
+          Mail The Reorder Suggestion List Every
         </span>
 
         <input
@@ -95,23 +95,23 @@ const AutoReodrRect = ({ API_BASE_URL }) => {
           onChange={(e) => setIntervalInput(e.target.value)}
           placeholder="Integer"
           className="w-20 py-1 px-2 border border-gray-300 rounded-md 
-                     focus:outline-none focus:ring-2 focus:ring-blue-400"
+             focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        <span className="font-medium text-gray-700">DAYS</span>
+        <span className="font-medium text-gray-700">Days</span>
 
         <button
           type="submit"
           disabled={loading}
           className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 
-                     disabled:opacity-60"
+             disabled:opacity-60"
         >
-          {loading ? 'Resetting...' : 'SET'}
+          {loading ? 'Resetting...' : 'Set'}
         </button>
 
         <span className="text-sm text-gray-600">
           {currentInterval !== null
-            ? `(Current: ${currentInterval} day(s))`
+            ? `(Current: ${currentInterval} Day(s))`
             : '(Loading...)'}
         </span>
       </form>

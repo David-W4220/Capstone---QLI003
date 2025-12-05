@@ -21,24 +21,20 @@ import AuditLogTable from "../tables/AuditLogTable"
 import AuditLogDetailsModal from "../modals/AuditLogDetailsModal"
 import TransactionLogTable from "../tables/TransactionLogTable"
 import TransactionLogDetailsModal from "../modals/TransactionLogDetailsModal"
-import LoginModal from "../modals/LoginModal" // NEW: Import the new modal
+import LoginModal from "../modals/LoginModal" 
 import useEquipmentData from "../hooks/useEquipmentData"
 import useReportGeneration from "../hooks/useReportGeneration"
 import useSignalR from "../hooks/useSignalR"
 import useLowStockCount from "../hooks/useLowStockCount"
 import useEquipmentFilter from "../hooks/useEquipmentFilter"
+import AutoReodrRect from "../ui/AutoReordrRect"
+import useAutoReodr from "../hooks/useAutoReodr" 
 
-import useAutoReodr from "../hooks/useAutoReodr" //for AutoReorder's UI Feedback
-
-const API_BASE_URL = "https://localhost:7058" // Change the API_Base_URL to your hosts IP.
-import useAutoReodr from "../hooks/useAutoReodr"//for AutoReorder's UI Feedback
-import AutoReodrRect from "../ui/AutoReodrRect"//NEW rectangle to set reorder mailing interval
-// IE: from localhost to 192.168.X.X or the like
+const API_BASE_URL = "https://localhost:7058" // Using the secure port 7058
 const HUB_URL = `${API_BASE_URL}/qliHub`
-const LOGIN_API_URL = `${API_BASE_URL}/api/Admins/login` // NEW: Login API URL
+const LOGIN_API_URL = `${API_BASE_URL}/api/Admins/login` 
 const TABLE_CONTROLLERS = {
   Equipment: "Equipment",
-  Admins: "Admins",
   "Audit Log": "Auditlog",
   "Transaction Log": "Transactionlog",
 }
@@ -48,11 +44,12 @@ const TABLE_CONTROLLERS = {
  * Manages state, data fetching, and SignalR connection.
  */
 const InventoryApp = () => {
-  // --- UPDATED AUTHENTICATION STATE ---
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // Start as logged out
-  const [currentUser, setCurrentUser] = useState(null) // Holds user name (e.g., "Olivia")
-  const [userRole, setUserRole] = useState("Public") // New state: 'Public' or 'Admin'
-  const [showLoginModal, setShowLoginModal] = useState(false) // State for login modal
+  // --- AUTHENTICATION STATE ---
+  const [isLoggedIn, setIsLoggedIn] = useState(false) 
+  const [currentUser, setCurrentUser] = useState(null) 
+  const [userRole, setUserRole] = useState("Public") 
+  const [showLoginModal, setShowLoginModal] = useState(false) 
+  const [adminId, setAdminId] = useState(null); 
 
   // State for which table is currently selected
   const [selectedTable, setSelectedTable] = useState("Equipment")
@@ -75,7 +72,7 @@ const InventoryApp = () => {
   // Custom hooks
   const { equipment, loading, error, fetchEquipment } = useEquipmentData(API_URL)
   const { reportStatus, handleGenerateReport } = useReportGeneration(REPORT_API_URL)
-  const { autoStatus } = useAutoReodr() //for AutoReorder's UI Feedback
+  const { autoStatus } = useAutoReodr() 
   const lowStockCount = useLowStockCount(equipment)
   const {
     searchTerm,
@@ -95,39 +92,35 @@ const InventoryApp = () => {
   // SignalR real-time updates
   useSignalR(HUB_URL, fetchEquipment)
 
-  // --- NEW: Handle Admin Login (API Integration) ---
+  // --- Handle Admin Login (API Integration) ---
   const handleLogin = async (username, password) => {
     try {
       const response = await fetch(LOGIN_API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Username: username, Password: password }), // Send credentials
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Username: username, Password: password }),
       })
 
       if (response.ok) {
         const adminData = await response.json()
         
-        // Success: Set state based on API response
+        setAdminId(adminData.Id);
         setCurrentUser(adminData.Username)
         setUserRole('Admin')
         setIsLoggedIn(true)
         setShowLoginModal(false)
         console.log(`Admin ${adminData.Username} logged in successfully.`)
-        return true // Indicate success
+        return true 
       } else {
-        // Failure: API returned 401 Unauthorized or similar
         const errorText = await response.text()
         console.error("Login failed:", errorText)
         alert("Login failed: Invalid username or password.")
-        return false // Indicate failure
+        return false 
       }
     } catch (error) {
-      // Network error
       console.error("Network error during login:", error)
       alert("A network error occurred. Please check the API status.")
-      return false // Indicate failure
+      return false 
     }
   }
 
@@ -155,7 +148,6 @@ const InventoryApp = () => {
     if (userRole === 'Admin') {
       setSelectedTable(table)
     } else {
-        // Prevent non-admins from changing the table
         setSelectedTable('Equipment')
     }
   }
@@ -165,13 +157,13 @@ const InventoryApp = () => {
     setIsLoggedIn(false)
     setCurrentUser(null)
     setUserRole("Public")
-    setSelectedTable("Equipment") // Always reset view to Equipment on logout
+    setAdminId(null); // Clear the Admin's ID on logout
+    setSelectedTable("Equipment") 
     console.log("Admin logged out.")
   }
 
   // Handle view low stock items
   const handleViewLowStock = () => {
-    // Set filter to show only low stock items
     setFilterStatus("low")
   }
 
@@ -233,7 +225,13 @@ const InventoryApp = () => {
     }
   }
 
+  // --- UPDATED: Uses adminId for Audit Log ---
   const handleConfirmDelete = async (item) => {
+    if (!adminId) {
+        alert("Action requires an active Admin session.");
+        return;
+    }
+    
     try {
       const equipmentId = item.Equipment_Id || item.ID
       const response = await fetch(`${API_URL}/delete/${equipmentId}`, {
@@ -245,7 +243,7 @@ const InventoryApp = () => {
 
         // Create audit log entry for equipment deletion
         const auditLog = {
-          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Admin_ID: adminId, // CRITICAL FIX: Use stored Admin ID
           Act_Description: `Deleted equipment: ${item.Name} (ID: ${equipmentId})`,
           Timestamp: new Date().toISOString(),
         }
@@ -269,9 +267,9 @@ const InventoryApp = () => {
     }
   }
 
-  // Handle edit submission
+  // --- UPDATED: Uses adminId for Audit Log ---
   const handleEditSubmit = async (formData) => {
-    if (!selectedEquipment) return
+    if (!selectedEquipment || !adminId) return
 
     try {
       // Prepare full equipment object for API
@@ -299,7 +297,7 @@ const InventoryApp = () => {
 
         // Create audit log entry for equipment update
         const auditLog = {
-          Admin_ID: 1, // TODO: Replace with actual admin ID when authentication is implemented
+          Admin_ID: adminId,
           Act_Description: `Updated equipment: ${updateData.Name} (ID: ${updateData.ID})`,
           Timestamp: new Date().toISOString(),
         }
@@ -355,9 +353,14 @@ const InventoryApp = () => {
             {autoStatus.message}
           </div>
         )}
+        
+        {/* NEW: Auto Reorder Interval Setting (Admin Only) */}
+        {selectedTable === 'Equipment' && userRole === 'Admin' && (
+            <AutoReodrRect API_BASE_URL={API_BASE_URL} />
+        )}
 
         {/* Low Stock Alert - Only show for Equipment table */}
-        {selectedTable === 'Equipment' && (
+        {selectedTable === 'Equipment' && userRole === 'Admin' && (
           <LowStockAlert
             lowStockCount={lowStockCount}
             onViewLowStock={handleViewLowStock}
@@ -387,21 +390,13 @@ const InventoryApp = () => {
         )}
 
         {/* Action Buttons Bar (Admin Only for Add/Export/Report) */}
-        {/* NEW rectangle to set reorder mailing interval */}
-        {selectedTable === 'Equipment' && (
-          <AutoReodrRect
-          API_BASE_URL={API_BASE_URL}
-          />
-        )}
-
-        {/* Action Buttons Bar - Only show for Equipment table */}
         {selectedTable === 'Equipment' && (
           <ActionButtonsBar
-            onAddEquipment={handleAddEquipment} // Pass the handler directly
-            onExportReport={handleExportReport} // Pass the handler directly
-            onGenerateHistoryReport={handleGenerateReport} // Pass the handler directly
+            onAddEquipment={handleAddEquipment}
+            onExportReport={handleExportReport}
+            onGenerateHistoryReport={handleGenerateReport}
             isGeneratingReport={reportStatus.includes("Generating")}
-            userRole={userRole} // <--- CRITICAL: Pass the userRole state
+            userRole={userRole} // Pass role to ActionButtonsBar for internal checks
           />
         )}
 
@@ -423,7 +418,7 @@ const InventoryApp = () => {
           <EquipmentTableWithActions
             equipment={filteredEquipment}
             loading={loading}
-            userRole={userRole} // Pass role to hide/show inline edit/delete
+            userRole={userRole} 
             onCheckout={handleCheckout}
             onCheckin={handleCheckin}
             onEdit={handleEdit}
@@ -525,7 +520,7 @@ const InventoryApp = () => {
           }}
         />
 
-        {/* NEW: Login Modal Inclusion */}
+        {/* Login Modal Inclusion */}
         <LoginModal
             isOpen={showLoginModal}
             onClose={() => setShowLoginModal(false)}
