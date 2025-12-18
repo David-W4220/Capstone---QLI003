@@ -13,4 +13,5 @@ public class Equipment
     public string? BuyQty { get; set; }
     public int Item_Cnt { get; set; } 
     public string? Alpha_Loc { get; set; } 
+    public bool IsDeleted { get; set; } = false;
 }

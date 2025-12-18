@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { API_BASE_URL } from "../main/InventoryApp"
 
 const AuditLogTable = ({ logs, loading, onRowClick }) => {
   const [sortOrder, setSortOrder] = useState("desc")
@@ -9,12 +10,12 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
   useEffect(() => {
     const fetchAdminNames = async () => {
       try {
-        const response = await fetch('http://localhost:5097/api/Admins')
+        const response = await fetch(`${API_BASE_URL}/api/Admins`)
         if (response.ok) {
           const admins = await response.json()
           const namesMap = {}
           admins.forEach(admin => {
-            namesMap[admin.ID] = admin.Name || `Admin ${admin.ID}`
+            namesMap[admin.ID] = admin.Username || `Admin ${admin.ID}`
           })
           setAdminNames(namesMap)
         }
@@ -125,7 +126,7 @@ const AuditLogTable = ({ logs, loading, onRowClick }) => {
           onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
           className="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors whitespace-nowrap"
         >
-          Sort {sortOrder === "desc" ? "Oldest" : "Newest"}
+          Sort {sortOrder === "desc" ? "Newest" : "Oldest"}
         </button>
       </div>
 

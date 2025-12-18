@@ -190,7 +190,8 @@ Set-ExecutionPolicy \-ExecutionPolicy RemoteSigned \-Scope CurrentUser
 
 ### **Milestone 5: Polish & Documentation**
 
-* Code cleanup and optimization.  
+* Code cleanup and optimization.
+* Bug fixes.  
 * Finalized documentation and README clarification.
 
 ## **Active Branches**

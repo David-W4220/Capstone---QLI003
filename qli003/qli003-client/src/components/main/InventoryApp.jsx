@@ -30,7 +30,7 @@ import useEquipmentFilter from "../hooks/useEquipmentFilter"
 import AutoReodrRect from "../ui/AutoReordrRect"
 import useAutoReodr from "../hooks/useAutoReodr" 
 
-const API_BASE_URL = "https://localhost:7058" // Using the secure port 7058
+export const API_BASE_URL = "https://localhost:7058"
 const HUB_URL = `${API_BASE_URL}/qliHub`
 const LOGIN_API_URL = `${API_BASE_URL}/api/Admins/login` 
 const TABLE_CONTROLLERS = {
@@ -50,6 +50,12 @@ const InventoryApp = () => {
   const [userRole, setUserRole] = useState("Public") 
   const [showLoginModal, setShowLoginModal] = useState(false) 
   const [adminId, setAdminId] = useState(null); 
+
+  const getLocalTimestamp = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now - offset).toISOString().slice(0, 19);
+  };
 
   // State for which table is currently selected
   const [selectedTable, setSelectedTable] = useState("Equipment")
@@ -104,7 +110,8 @@ const InventoryApp = () => {
       if (response.ok) {
         const adminData = await response.json()
         
-        setAdminId(adminData.Id);
+        // FIX: Capture ID regardless of property casing (id, Id, ID)
+        setAdminId(adminData.Id || adminData.ID || adminData.id);
         setCurrentUser(adminData.Username)
         setUserRole('Admin')
         setIsLoggedIn(true)
@@ -172,7 +179,7 @@ const InventoryApp = () => {
     setAddModalOpen(true)
   }
 
-  // Handle export report console.log("Exporting report...")
+  // Handle export report
   const handleExportReport = async () => {
     console.log("Exporting report...")
     try {
@@ -225,7 +232,7 @@ const InventoryApp = () => {
     }
   }
 
-  // --- UPDATED: Uses adminId for Audit Log ---
+  // --- UPDATED: Uses adminId for Audit Log and local timestamp ---
   const handleConfirmDelete = async (item) => {
     if (!adminId) {
         alert("Action requires an active Admin session.");
@@ -243,9 +250,9 @@ const InventoryApp = () => {
 
         // Create audit log entry for equipment deletion
         const auditLog = {
-          Admin_ID: adminId, // CRITICAL FIX: Use stored Admin ID
+          Admin_ID: adminId, 
           Act_Description: `Deleted equipment: ${item.Name} (ID: ${equipmentId})`,
-          Timestamp: new Date().toISOString(),
+          Timestamp: getLocalTimestamp(), // FRESH LOCAL TIME
         }
 
         await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
@@ -267,7 +274,7 @@ const InventoryApp = () => {
     }
   }
 
-  // --- UPDATED: Uses adminId for Audit Log ---
+  // --- UPDATED: Uses adminId for Audit Log and local timestamp ---
   const handleEditSubmit = async (formData) => {
     if (!selectedEquipment || !adminId) return
 
@@ -299,7 +306,7 @@ const InventoryApp = () => {
         const auditLog = {
           Admin_ID: adminId,
           Act_Description: `Updated equipment: ${updateData.Name} (ID: ${updateData.ID})`,
-          Timestamp: new Date().toISOString(),
+          Timestamp: getLocalTimestamp(), // FRESH LOCAL TIME
         }
 
         await fetch(`${API_BASE_URL}/api/Auditlog/add`, {
@@ -396,7 +403,7 @@ const InventoryApp = () => {
             onExportReport={handleExportReport}
             onGenerateHistoryReport={handleGenerateReport}
             isGeneratingReport={reportStatus.includes("Generating")}
-            userRole={userRole} // Pass role to ActionButtonsBar for internal checks
+            userRole={userRole} 
           />
         )}
 
@@ -462,6 +469,7 @@ const InventoryApp = () => {
           }}
           onSignOut={fetchEquipment}
           API_URL={API_URL}
+          adminId={adminId}
         />
 
         <EquipmentAddModal
@@ -469,6 +477,7 @@ const InventoryApp = () => {
           onClose={() => setAddModalOpen(false)}
           onAdd={fetchEquipment}
           API_URL={API_URL}
+          adminId={adminId}
         />
 
         <EquipmentCheckInModal
@@ -480,6 +489,7 @@ const InventoryApp = () => {
           }}
           onCheckIn={fetchEquipment}
           API_URL={API_URL}
+          adminId={adminId}
         />
 
         <EquipmentEditModal

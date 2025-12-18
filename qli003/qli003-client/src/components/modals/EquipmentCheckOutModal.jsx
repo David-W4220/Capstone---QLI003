@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut, API_URL }) => {
+const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut, API_URL, adminId }) => {
     const [userName, setUserName] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [notes, setNotes] = useState('');
@@ -17,6 +17,13 @@ const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut,
             setStatus('');
         }
     }, [isOpen]);
+
+    // HELPER: Generates a fresh local timestamp in YYYY-MM-DDTHH:MM:SS format
+    const getFreshLocalTimestamp = () => {
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000;
+        return new Date(now - offset).toISOString().slice(0, 19);
+    };
 
     const validateForm = () => {
         const newErrors = {};
@@ -51,13 +58,17 @@ const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut,
         setStatus('Processing...');
 
         try {
+            // Generate a fresh local timestamp at the moment of submission
+            const currentTimestamp = getFreshLocalTimestamp();
+
             // Create transaction log entry
             const transaction = {
                 Equipment_ID: selectedEquipment.ID,
                 Check_In: false, // false for sign-out
                 Quantity_Changed: quantity,
-                Timestamp: new Date().toISOString(),
+                Timestamp: currentTimestamp,
                 Condition: 0, // 0 = Good, 1 = Needs_Repair, 2 = Broken
+                Admin_ID: adminId || 1, // Uses the logged-in admin's ID
                 Optional_Notes: `Signed out by: ${userName}${notes ? ' - ' + notes : ''}`
             };
 
@@ -76,32 +87,28 @@ const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut,
                 throw new Error(`Failed to create transaction log: ${transactionResponse.status} - ${errorText}`);
             }
 
-            if (transactionResponse.ok) {
-                // Update equipment quantity
-                const updatedEquipment = {
-                    ...selectedEquipment,
-                    Item_Cnt: selectedEquipment.Item_Cnt - quantity
-                };
+            // Update equipment quantity
+            const updatedEquipment = {
+                ...selectedEquipment,
+                Item_Cnt: selectedEquipment.Item_Cnt - quantity
+            };
 
-                const equipmentResponse = await fetch(`${API_URL}/update/${selectedEquipment.ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(updatedEquipment)
-                });
+            const equipmentResponse = await fetch(`${API_URL}/update/${selectedEquipment.ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedEquipment)
+            });
 
-                if (equipmentResponse.ok) {
-                    setStatus('Equipment successfully signed out!');
-                    setTimeout(() => {
-                        onClose();
-                        if (onSignOut) onSignOut();
-                    }, 1500);
-                } else {
-                    throw new Error('Failed to update equipment quantity');
-                }
+            if (equipmentResponse.ok) {
+                setStatus('Equipment successfully signed out!');
+                setTimeout(() => {
+                    onClose();
+                    if (onSignOut) onSignOut();
+                }, 1500);
             } else {
-                throw new Error('Failed to create transaction log');
+                throw new Error('Failed to update equipment quantity');
             }
         } catch (error) {
             setStatus(`Error: ${error.message}`);
@@ -210,7 +217,7 @@ const EquipmentCheckOutModal = ({ selectedEquipment, isOpen, onClose, onSignOut,
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 py-2.5 px-4 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 py-2.5 px-4 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 disabled:bg-gray-300 transition-colors"
                                 disabled={!userName.trim() || status === 'Processing...'}
                             >
                                 {status === 'Processing...' ? 'Processing...' : 'Check Out'}

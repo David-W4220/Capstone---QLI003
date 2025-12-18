@@ -7,7 +7,7 @@ const EquipmentTableWithActions = ({
   onEdit, 
   onDelete,
   onRowClick,
-  userRole // <-- NEW: Accept the userRole prop
+  userRole
 }) => {
   
   // Determine if the current user has Admin privileges
