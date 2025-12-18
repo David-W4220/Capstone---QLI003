@@ -1,169 +1,198 @@
-# QLI003 Application
-This application will be used to track QLI's OT inventory closet and have a user based system where they can see what items are available to take out or put back in if they've ordered them. It will also send out emails if stock is at a certain threshhold with links (if provided) to repurchase items.
-There will also be logs to audit what is going in and out and admin privileges to add, remove, or modify any items that they need.
+# **QLI003 \- OT Inventory Management System**
 
-## Release Notes
-As of right now our app has functioning database, backend, frontend connections that make them work together in real time. There is a barebones UI to test functions with the SignalR sockets and the program can be editted currently to connect from any device on the local network.
-We are still editing the database a little but but all of the features and work that has been done is either in line with our milestone plan or even more than what was expected.\
-There are plans to work on email sending, user verification, and updating the UI of the application.\
-Below is extra stuff for logging of packages, requirements, etc. in case others need them.
+## **About the Application**
 
+*(Note: Replace the image link above with your actual architecture diagram if available)*  
+This application is an inventory tracking system designed for QLI's OT closet. It provides a real-time, user-based interface to manage equipment stock.  
+**Key Features:**
 
-## Packages and misc.
-npx create react app basis\
-dotnet new webapi basis\
-Extra packages are MySql.Data.EntityFrameworkCore, MySql.Data, Microsoft.AspNetCore.SignalR for .NET\
-Extra packages are @microsoft/signalr for React\
-Had to include <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script> in index.html for signalr to work
+* **Inventory Management:** Users can view available items, check them out, and check them back in.  
+* **Real-Time Updates:** Uses **SignalR** to update inventory counts instantly across all connected devices without refreshing.  
+* **Automated Reordering:** Recursively scans for low-stock items and emails a formatted repurchasing list with links to administrators.  
+* **Reporting & Logging:** Generates comprehensive PDF reports of transaction history and audit logs.  
+* **Admin Privileges:** Secure login for administrators to add, remove, or modify equipment details and configure system settings.
 
-## Requirements
-Install node.js .net8.0 mysql community server and workbench: workbench is optional, I would watch a video on the server if you don't know about it but maybe thats just mac\
-You'll want the c# dev kit on vs code\
-Run npm install in the client console.
-dotnet dev-certs https --trust - This allows your localhost or whatever you are using to do HTTPS - main terminal not in application location
-npm install cross-env --save-dev - to do https
+## **Getting Started**
 
-## How to Run
-Update database=schema to whatever you called it, user and password in appsetings.json in api\
-Update local host stuff like port if needed to match what .NET api is running on same thing with inventoryapp.jsx in client
+### **Prerequisites**
 
-Open terminal for qli003-api  dotnet run\
-open terminal for qli003-client npm start - might have to do npm install first too
+* **Node.js**  
+* **.NET 8.0 SDK** (C\# Dev Kit recommended for VS Code)  
+* **MySQL Community Server** (MySQL Workbench optional)  
+* **Papercut SMTP** (For testing email functionality locally)
 
-Basically once you start the .NET and then go to the API and start that it opens a localhost that currently provides a whole list of the equipment table and you can chose from a dropdown an item youd like the change the description of. The main test of this was to see how to implement real time database changes and how to link up sql - dotnet - react.js
+### **Installation & Setup**
 
----------
+1. Install Frontend Dependencies:  
+   Open a terminal in the client folder. This will automatically install all required packages (including cross-env for HTTPS support) based on the package.json file.  
+   cd qli003-client  
+   npm install
 
-# Mailing Feature(Finalized 12/2/2025)
-The mailing feature includes
-1. Functionality to create a "Inventory summary report" that includes formatted contents of transaction log and audit log datum with timestamps and send it to a designated mailing address. This is manually triggered by a `generate history report` button through React UI or by Swagger endpoint testing.
-   
-2. Functionnaliy to scan for low/out of stock items recursively by a frontend configurable time interval(default is 7 days), formats a list of them(if any) with corresponding suggested repurchasing quantities and links(and indicate in the mail if its unavaliable yet), into a HTML table. Then, send it to a designated mailing address. This is a fully automatic backend feature(its relevant status/error messages will still show up in React UI as feedback). It starts automatically when the server starts. 
+2. Trust HTTPS Development Certificates:  
+   Required for the secure connection between React and .NET on local machines.  
+   dotnet dev-certs https \--trust
 
-## Modified/newly added files
-qli003-api:
-- services/
-  - AutoReodrLk.cs
-  - HistoryPDF.cs
-- controllers/
-  - ReportController.cs
-  - AutoReodrSetting.cs
-  
-qli003-client:
-- inventoryApp.jsx
-- src/components/hooks/
-  - useAutoReodr.js
-  - useSignalR.js
-- src/components/ui/
-  - AutoReodrRect.jsx
-  
-## Requirements
-- Packages
-```
-cd qli003-api
-dotnet add package MailKit
-dotnet add package QuestPDF
+3. Database Configuration:  
+   Update the ConnectionStrings in qli003-api/appsettings.json with your local MySQL credentials:  
+   "ConnectionStrings": {  
+     "DefaultConnection": "server=localhost;database=qli\_db;user=root;password=your\_password;"  
+   }
 
-cd..; cd qli003
-npm install axios 
-```
+4. SMTP Configuration:  
+   To test the mailing features, configure your SMTP settings in appsettings.json. For local testing with Papercut:  
+   "SMTP": {  
+     "Host": "localhost",  
+     "Port": 25,  
+     "Username": "",  
+     "Password": ""  
+   }
 
-- Install Papercut SMTP to view the mail and PDF attatchment
-- Install test mailing server `Papercut SMTP` to view the mail contents and PDF attatchment.
+## **How to Run**
 
-- Register the two mail services in `Program.cs` by adding these lines
-```
-builder.Services.AddScoped<HistoryPDF>();
-//builder.Services.AddScoped<AutoReodrLk>(); //for Swagger UI testing only
-builder.Services.AddHostedService<AutoReodrLk>();
-builder.Services.AddSingleton<AutoReodrSetting>();
-```
-<br>Before<br>  
-`builder.WebHost.UseUrls("http://0.0.0.0:5097");`
+You can run the application using the provided quick-start scripts or manually via the terminal.
 
-- Configure SMTP in appsettings.json
-```
-"SMTP": {
-  "Host": "localhost",
-  "Port": 25,
-  "Username": "",
-  "Password": ""
+### **Quick Start (Recommended)**
+
+These scripts launch both the API and the Client simultaneously.
+
+* **Windows:** start-app-windows.bat  
+* **Mac/Linux:** ./start-app-mac.command
+
+### **Manual Start**
+
+**1\. Start the Backend API:**  
+cd qli003-api  
+dotnet run
+
+*Note: You can view the API endpoints via Swagger UI at https://localhost:7058/swagger/index.html.*  
+**2\. Start the Frontend Client:**  
+cd qli003-client  
+npm start
+
+## **Network Configuration (Changing IP & Ports)**
+
+To allow other devices to access the application, or to resolve port conflicts, you may need to change the IP address or Port numbers.
+
+### **1\. Changing the IP Address (Hosting on LAN)**
+
+To host for other users on your Wi-Fi:
+
+* **Find your IP:** Run ipconfig (Windows) or ifconfig (Mac/Linux) to get your IPv4 address (e.g., 192.168.1.15).  
+* **Update Frontend:** In qli003-client/src/InventoryApp.jsx, change API\_BASE\_URL to https://192.168.1.15:7058.  
+* **Run Backend:** Start the API with dotnet run \--urls "https://0.0.0.0:7058".
+
+### **2\. Changing the Port Numbers**
+
+If the default ports (**7058** for API, **3000** for Client) are busy or you prefer different ones, follow these steps:  
+**A. Backend API Port:**
+
+1. Open qli003-api/Properties/launchSettings.json.  
+2. Find the https profile and change the applicationUrl.  
+   "applicationUrl": "https://localhost:8000;http://localhost:5000",
+
+3. **Update React:** You must also update the API\_BASE\_URL in InventoryApp.jsx to match this new port.  
+4. **Update Swagger:** If you change the port (e.g., to **8000**), your Swagger UI address will also change. You will now access it at https://localhost:8000/swagger.
+
+**B. Frontend Client Port:**
+
+1. Open qli003-client/package.json.  
+2. Update the start script to include the PORT variable.  
+   "scripts": {  
+     "start": "cross-env PORT=4000 HTTPS=true node node\_modules/react-scripts/bin/react-scripts.js start"  
+   }
+
+   *(This example switches React to port 4000).*
+
+## **Scripts & HTTPS Configuration**
+
+We have customized the startup scripts to ensure the application runs securely over HTTPS on all operating systems (Windows, Mac, Linux).
+
+### **The "start" Script**
+
+In qli003-client/package.json, the start command is configured as follows:  
+"scripts": {  
+  "start": "cross-env HTTPS=true node node\_modules/react-scripts/bin/react-scripts.js start"  
 }
-```
 
-## Notes
-1. To test Without using frontend, Do `dotnet run`, then open [Swagger UI](http://localhost:5097/swagger/index.html), several `POST` and `GET` method under corresponding endpoint catagories `AutoReodrSetting`, `AutoReorder` and `Report`. These are where to click "Try it out" and then "Execute". You should see the results in the Response body beneath.
+* **cross-env HTTPS=true**: This forces the React development server to launch in Secure Mode (HTTPS).  
+* **node node\_modules/...**: This uses the absolute path to the executable. This is crucial for Windows compatibility, preventing "Command not found" errors that often occur with standard scripts.
 
-2. React UI included status/error messages to indicate if things are going correctly, or why its not. To view the actual content will require Papercut SMTP server opened. If sended successfully, go to its UI, plain text messages should be viewable under "message" while "Headers" should contain other mail info. As for the pdf report, right click, save as to view it locally if you cant open it directly under "Sections".
+### **Custom Batch Scripts**
 
-3. Resetting the time interval of reorder link mails in React does take effect immediately, but it resets to the default value if the server restarts.
-      
-4. The `export report` button in React UI is not a part of mailing feature, but also included in this catagory. Upon clicking, it downloads a comprehensive PDF report of audit logs and transaction logs and a list of low/out of stock items(or indicate that no items' are below threshold currently) to local.
+For convenience, we included start-app-windows.bat and start-app-mac.command. These scripts automate the process of opening two terminal windows (one for the API, one for the Client) and executing the run commands simultaneously. If you need to change ports or launch arguments, edit these files in any text editor.
 
+## **Running Tests**
 
----------
+The project includes comprehensive frontend unit tests covering modal interactions, form validation, and network mocking.
 
-# UI Enhancement & Modal Components Update - November 9, 2025
+### **1\. Run All Tests**
 
-## New Features Added
+To run the full test suite in interactive mode:  
+cd qli003-client  
+npm test
 
-### 1. Modal Components (components-new/)
-Merge austin's three new modal components with Tailwind CSS (no external dependencies):
-- **EquipmentUpdateModal.jsx** - Update equipment descriptions via modal popup
-- **EquipmentDetailsModal.jsx** - View detailed equipment information by clicking table rows
-- **EquipmentSignOutModal.jsx** - Check Out equipment with transaction logging
+### **2\. Run Specific Tests**
 
-### 2. UI Improvements
-- Removed inline update form in favor of cleaner modal interface
-- Made table rows clickable to view equipment details
-- Added "Check Out Equipment" button with full transaction tracking
-- Implemented dynamic table rendering that displays all table types (Equipment, Admins, Auditlog, Transactionlog)
+To run tests only for a specific component (e.g., the Update Modal):  
+npm test \-- \-t EquipmentUpdateModal
 
-### 3. Mobile Responsiveness
-- Enhanced mobile and tablet compatibility
-- Responsive table with overflow handling
-- Touch-friendly buttons and modals
-- Adaptive layouts for different screen sizes
+### **3\. CI Mode (Run Once)**
 
-### 4. Bug Fixes
-- Fixed transaction log foreign key constraint (changed `Inventory_ID` to `Equipment_ID`)
-- Fixed modal visibility issues (buttons now stay visible when modal opens)
-- Added proper error handling and user feedback messages
-- Improved data refresh after operations
+To run all tests once and exit (useful for automated pipelines):  
+npm test \-- \--watchAll=false
 
-## Files Modified
-- `src/Inventory-App.jsx` - Main application with modal integration and dynamic table
-- `src/components-new/EquipmentUpdateModal.jsx` - Modal for updates
-- `src/components-new/EquipmentDetailsModal.jsx` - Modal for viewing details
-- `src/components-new/EquipmentSignOutModal.jsx` - Modal for sign-out with transaction logging
+### **4\. PowerShell Troubleshooting**
 
-## How to Use New Features
+If you are on Windows and see an error about execution policies when running tests, run this command in PowerShell to allow the scripts:  
+Set-ExecutionPolicy \-ExecutionPolicy RemoteSigned \-Scope CurrentUser
 
-### View Equipment Details
-- Click any row in the Equipment table to see full details including stock status and reorder information
+### **Test Coverage Areas**
 
-### Update Equipment
-- Click "Update Equipment" button
-- Select equipment and modify description
-- Changes save and refresh automatically
+* **EquipmentDetailsModal**: Verifies modal rendering and close behavior.  
+* **EquipmentSignOutModal**: Tests sign-out workflows and name field validation.  
+* **EquipmentUpdateModal**: Tests description validation and update submission.  
+* **App.test.js**: Verifies main application rendering and headers.
 
-### Check Out Equipment
-- Click "Checkout Equipment" button
-- Enter your name (required)
-- Select equipment and quantity
-- Optionally add notes
-- System creates transaction log entry and updates inventory count
+## **Troubleshooting & Tips**
 
-### View Transaction History
-- Use the table dropdown at the top
-- Select "Transactionlog" to see all check-in/check-out history
-- View timestamps, quantities, and user notes
+* Browser "Not Secure" Warning:  
+  Because we are using a self-signed development certificate, your browser will warn you that the connection is "Not Secure". This is normal for local development. Click "Advanced" \-\> "Proceed to localhost (unsafe)" to continue.  
+* Firewall Blocking (Mobile Testing):  
+  If you configured the IP address correctly but your phone still cannot connect, your computer's firewall is likely blocking the connection. You must create an Inbound Rule in Windows Defender Firewall to allow traffic on ports 3000 (React) and 7058 (.NET API).  
+* Database Connection Errors:  
+  Ensure your MySQL server is actually running. If using XAMPP or MySQL Workbench, verify the service status green light.
 
-## Technical Notes
-- All modals use Tailwind CSS for consistent styling
-- No external modal libraries required (removed react-modal dependency)
-- Real-time updates via SignalR still functional
-- Transaction logs properly track equipment sign-outs with foreign key constraints
+## **Release Notes & Milestones**
 
-## Release Notes 11/24/2025
-Basically everything as mentioned before. Exporting inventory report button works, along with a major update in the frontend on how the app functions.
+### **Milestone 1: Core Architecture**
+
+* Established connection between **MySQL**, **.NET WebAPI**, and **React**.  
+* Implemented **SignalR** for real-time bi-directional communication.  
+* Basic UI created to display equipment tables and allow real-time description editing.
+
+### **Milestone 2: Foundation for Features**
+
+* Began work on updating the User Interface.  
+* Started implementation of Tailwind CSS Modals.  
+* Initial backend work for mailing features (Work in Progress).
+
+### **Milestone 3: UI Overhaul & Logging**
+
+* **Complete UI Overhaul:** Finalized the switch to Tailwind CSS and dynamic tables.  
+* **Transaction Logging:** Implemented full tracking for Check-In/Check-Out actions.  
+* **Exports:** Added functionality to export inventory summaries as PDF reports.
+
+### **Milestone 4: Security, Automation & Testing**
+
+* **Admin Security:** Implemented Admin Login functionality; restricted editing, deleting, and configuration features to authenticated admins only.  
+* **Mailing Complete:** Finalized automated low-stock scanning and "History Report" emailing.  
+* **Testing:** Added comprehensive unit tests for frontend components and modals.
+
+### **Milestone 5: Polish & Documentation**
+
+* Code cleanup and optimization.  
+* Finalized documentation and README clarification.
+
+## **Active Branches**
+
+* **main**: Contains the stable, production-ready code with all features listed above.
