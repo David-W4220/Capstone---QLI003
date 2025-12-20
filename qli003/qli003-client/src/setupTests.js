@@ -16,3 +16,15 @@ jest.mock('react-modal', () => {
 	MockModal.setAppElement = () => {};
 	return MockModal;
 });
+
+// Mock axios to avoid ESM import syntax errors during Jest runs
+jest.mock('axios', () => {
+	const mock = {
+		get: jest.fn(),
+		post: jest.fn(),
+		put: jest.fn(),
+		delete: jest.fn(),
+		create: () => mock,
+	};
+	return mock;
+});
